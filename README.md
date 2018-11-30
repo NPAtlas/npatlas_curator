@@ -3,8 +3,8 @@
 
 ### Note
 
-*Requires an Anaconda or Miniconda Python distribution in order to *
-*install RDKit.*
+*Requires an Anaconda or Miniconda Python distribution in order to 
+install RDKit.*
 
 ### Docker Deployment
 
@@ -85,6 +85,5 @@ or else it will default to `localhost`.
 docker build -t my-nginx:latest -t my-nginx:<VERSION> \
 --build-arg SERVER_NAME=<SERVER_NAME> ./my-nginx-container
 docker run --name nginx -v /etc/letsencrypt:/etc/letsencrypt \
--v /root/certs-data:/data/letsencrypt --link curator -d \
--p 80:80 -p 443:443 my-nginx:latest
+--link curator -d -p 80:80 -p 443:443 my-nginx:latest
 ```
