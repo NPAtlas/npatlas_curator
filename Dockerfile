@@ -8,7 +8,7 @@
 # If you prefer miniconda:
 FROM continuumio/miniconda3
 
-LABEL Name=curator_v3 Version=0.0.1
+LABEL Name=curator Version=0.3.0
 WORKDIR /app
 COPY requirements.txt /app
 # Using pip:
@@ -32,7 +32,7 @@ ENV FLASK_CONFIG=production
 ENV FLASK_ENV=production
 EXPOSE 5000
 
-RUN apt-get update && apt-get install -y libxrender-dev mysql-client gcc build-essential libc6-dev
+RUN apt-get update && apt-get install -y libxrender-dev mysql-client
 RUN /bin/bash -c "source activate curator && conda install -c conda-forge uwsgi libiconv"
 
 ADD . /app
