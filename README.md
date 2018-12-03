@@ -3,8 +3,8 @@
 
 ### Note
 
-*Requires an Anaconda or Miniconda Python distribution in order to *
-*install RDKit.*
+*Requires an Anaconda or Miniconda Python distribution in order to 
+install RDKit.*
 
 ### Docker Deployment
 
