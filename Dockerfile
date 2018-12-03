@@ -34,6 +34,7 @@ EXPOSE 5000
 
 RUN apt-get update && apt-get install -y libxrender-dev mysql-client
 RUN /bin/bash -c "source activate curator && conda install -c conda-forge uwsgi libiconv"
+RUN adduser -ms /bin/bash uwsgi
 
 ADD . /app
 CMD /bin/bash -c "source activate curator && uwsgi --ini curator.ini"
