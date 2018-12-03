@@ -9,6 +9,7 @@ htmlcov/
 dump.sql
 mysql-dumps/*sql
 
+
 # For playground purposes
 curator_env/
 
