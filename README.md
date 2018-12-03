@@ -3,7 +3,7 @@
 
 ### Note
 
-*Requires an Anaconda or Miniconda Python distribution in order to 
+*Requires an Anaconda or Miniconda Python distribution in order to
 install RDKit.*
 
 ### Docker Deployment
@@ -41,7 +41,7 @@ docker exec mysql bash -c 'mysqldump -uroot -p$MYSQL_ROOT_PASSWORD --all-databas
 Set the environment variables inside `mysql-container/Dockerfile`.
 
 ```
-docker run --name mysql -v mysql-data:/var/lib/mysql \
+docker run --name mysql -p 3306:3306 -v mysql-data:/var/lib/mysql \
 -v $(pwd)/mysql-dumps:/var/dumps -d -e MYSQL_DATABASE=npatlas_curation \
 -e MYSQL_USER=<DB_USER> -e MYSQL_PASSWORD=<DB_PASSWORD> \
 -e MYSQL_ROOT_PASSWORD=<ROOT_PASSWORD> mysql/mysql-server:5.7 \
