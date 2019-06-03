@@ -263,8 +263,9 @@ def problem_list(ds_id):
     problems = Problem.query.filter_by(dataset_id=ds_id).all()
     ds = Dataset.query.get_or_404(ds_id)
     inserted=ds.inserted()
+    db_string=current_app.config.get("ATLAS_DATABASE_URI", "None...")
     return render_template('checker/problems.html', ds_id=ds_id,
-        problems=problems, inserted=inserted)
+        problems=problems, inserted=inserted,db_string=db_string)
 
 
 @checker.route('/_search_journal')

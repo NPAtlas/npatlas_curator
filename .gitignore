@@ -8,7 +8,7 @@ __pycache__
 htmlcov/
 dump.sql
 mysql-dumps/*
-
+dh-params/
 
 # For playground purposes
 curator_env/

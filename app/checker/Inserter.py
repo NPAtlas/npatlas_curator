@@ -177,6 +177,9 @@ class Inserter(object):
         Update compound in NP Atlas and associate origin with reference
         """
         # Generate RDKit molecule with precomputed data
+        if not compound.npaid:
+            self.logger.error("Compound does not have an NPAID...")
+            return
         calc_compound = Compound(compound.smiles, name=compound.name)
         
         db_compound = session.query(atlasdb.Compound).get(compound.npaid)
