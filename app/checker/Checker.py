@@ -34,6 +34,7 @@ class Checker(object):
         self.logger = kwargs.get("logger") or self.default_logger()
 
         self.review_list = []
+        self.checked_compound_inchikeys = dict()
 
     def update_status(self, current, total, status):
         if self.task:
@@ -72,7 +73,13 @@ class Checker(object):
                 check_compound = self.create_checker_compound(
                     compound, standardize=standardize_compounds,
                     restart=restart)
+                if check_compound.inchikey not in self.checked_compound_inchikeys.keys():
+                    self.checked_compound_inchikeys[check_compound.inchikey] = [check_compound.id]
+                else:
+                    self.checked_compound_inchikeys[check_compound.inchikey].append(check_compound.id)
                 self.check_compound(check_compound)
+                # Add the checked list after checking complete
+
 
         self.logger.info("Done checking!")
         self.logger.info("There are %d problems to review", len(self.review_list))
@@ -131,6 +138,13 @@ class Checker(object):
 
         # If this compound has been checked and resolve don't worry about it's structure
         if not checker_compound.resolve:
+            # Check internally if compound has been seen before
+            id_list = self.checked_compound_inchikeys.get(checker_compound.inchikey)
+            if len(id_list) != 1:
+                self.logger.error("Internal redundancy of compounds!")
+                self.add_problem(checker_compound.get_article_id(), "internal_duplicate",
+                             comp_id=checker_compound.id)
+
             # Branch 2 - potentially new compound
             if not checker_compound.npaid:
                 # Check if structure is a duplicate
@@ -205,7 +219,7 @@ class Checker(object):
                                 restart=False):
         # If restarting check if anything was changed in the dataset
         restart_changed = False
-        if restart and db_compound.checker_compound:
+        if restart and db_compound.checker_compound and not db_compound.checker_compound.resolve:
             if inchikey_from_smiles(db_compound.smiles) != db_compound.checker_compound.inchikey:
                 self.logger.warning("Re-creating compound because structure changed!")
                 restart_changed = True
@@ -482,7 +496,7 @@ class Correction(object):
         self.problem = problem
 
     def __repr__(self):
-        return "{} -> {}".format(self.article_id + self.compound_id, self.problem)
+        return "{}: {} -> {}".format(self.article_id, self.compound_id, self.problem)
 
     @staticmethod
     def verify_problem(problem):
@@ -492,7 +506,7 @@ class Correction(object):
             or problem == "authors" or problem == "title" or problem == "pages"
             or problem == "abstract" or problem == "duplicate" 
             or problem == "flat_match" or problem == "genus"
-            or problem == "name_match"
+            or problem == "name_match" or problem == "internal_duplicate"
         )
 
 

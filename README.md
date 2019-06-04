@@ -39,8 +39,6 @@ docker exec mysql bash -c 'mysqldump -uroot -p$MYSQL_ROOT_PASSWORD --all-databas
 
 2) *MySQL Container*
 
-Set the environment variables inside `mysql-container/Dockerfile`.
-
 ```
 docker run --name mysql -p 3306:3306 -v mysql-data:/var/lib/mysql \
 -v $(pwd)/mysql-dumps:/var/dumps -d -e MYSQL_DATABASE=npatlas_curation \
@@ -55,7 +53,7 @@ The "Checker" portion of the curator app requires a Redis messaging queue
 in order to run the Celery tasks. This server can be started by running:
 
 ```
-docker run --restart always --name redis -p 6379:6379 -d redis
+docker run --restart always --name redis -d redis
 ```
 
 If you do the following, redis will stop trying to backup redis info. This
@@ -89,7 +87,7 @@ mysql -u<DB_USER> -p<DB_PASSWORD> -h<DBSERVER> npatlas_curation < dump.sql
 
 ```
 docker build -t curator:latest -t curator:<VERSION> .
-docker run --name curator -v $(pwd):/curator --restart always\
+docker run --name curator -v $(pwd):/curator --restart always \
 --link mysql:dbserver --link redis:redis \
 --log-opt max-size=5m --log-opt max-file=10 \
 -e DBSERVER=dbserver -e REDIS=redis -d curator:latest 
@@ -106,6 +104,7 @@ a self signed certificate in place of a letsencrypt one.
 docker build -t my-nginx:latest -t my-nginx:<VERSION> \
 --build-arg SERVER_NAME=<SERVER_NAME> ./my-nginx-container
 docker run --name nginx -v /etc/letsencrypt:/etc/letsencrypt \
+-v $(pwd)/dhparams:/etc/nginx/certs \
 --link curator -d -p 80:80 -p 443:443 my-nginx:latest
 ```
 

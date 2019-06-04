@@ -31,7 +31,7 @@ def start_checker_task(self, dataset_id, standardize_compounds=False,
 
     checker = Checker(dataset_id, celery_task=self, logger=logger)
     checker.run(standardize_compounds=standardize_compounds, restart=restart)
-    result = "/admin/resolve/dataset{}".format(dataset_id) 
+    result = "/admin/resolve/dataset{}".format(dataset_id)
 
     return {'current': 100, 'total': 100, 'status': 'Task completed!',
             'result': result}
@@ -53,7 +53,7 @@ def insert_dataset(self, dataset_id):
 
     result = "DATA INSERTED"
 
-    return {'current': 100, 'total': 100, 'status': 'Task completed!', 
+    return {'current': 100, 'total': 100, 'status': 'Task completed!',
             'result': result}
 
 
@@ -87,8 +87,8 @@ def inserterstatus():
         }
     elif task.state != 'FAILURE':
         current_app.logger.debug("{}: {}/{} - {}"\
-        .format(task.state, task.info.get('current',0), 
-                task.info.get('total',1), 
+        .format(task.state, task.info.get('current',0),
+                task.info.get('total',1),
                 task.info.get('status', 'Failed')))
         response = {
             'state': task.state,
@@ -118,7 +118,7 @@ def startstandard(dataset_id):
     checker_dataset = CheckerDataset.query.filter_by(dataset_id=dataset_id).first()
 
     if not checker_dataset:
-        checker_dataset = CheckerDataset(dataset_id=dataset_id, 
+        checker_dataset = CheckerDataset(dataset_id=dataset_id,
                                          celery_task_id=task.id)
         db_add_commit(checker_dataset)
 
@@ -150,9 +150,9 @@ def startchecker(dataset_id):
     standard = bool(request.args.get("standard", False))
     restart = bool(request.args.get("restart", False))
 
-    current_app.logger.info("Compound standardization is %s", 
+    current_app.logger.info("Compound standardization is %s",
                             "ON" if standard else "OFF")
-    checker_task = start_checker_task.delay(dataset_id=dataset_id, 
+    checker_task = start_checker_task.delay(dataset_id=dataset_id,
                                             standardize_compounds=standard,
                                             restart=restart)
     checker_dataset = CheckerDataset.query.filter_by(dataset_id=dataset_id).first()
@@ -180,7 +180,7 @@ def checkerstatus():
     if not task_id:
         abort(400)
     checker_task = start_checker_task.AsyncResult(task_id)
-    
+
     if checker_task.state == 'PENDING':
         current_app.logger.debug('PENDING...')
         response = {
@@ -191,8 +191,8 @@ def checkerstatus():
         }
     elif checker_task.state != 'FAILURE':
         current_app.logger.debug("{}: {}/{} - {}"\
-        .format(checker_task.state, checker_task.info.get('current',0), 
-                checker_task.info.get('total',1), 
+        .format(checker_task.state, checker_task.info.get('current',0),
+                checker_task.info.get('total',1),
                 checker_task.info.get('status', 'Failed')))
         response = {
             'state': checker_task.state,
@@ -252,7 +252,7 @@ def checkerrunning():
         }
     else:
         response = {}
-    
+
     return jsonify(response)
 
 
@@ -273,11 +273,11 @@ def journal_autocomplete():
     search = request.args.get('search')
     current_app.logger.debug("Search = %s", search)
     journals = Journal.query\
-                .filter(db.or_(Journal.journal.like(search+"%"), 
+                .filter(db.or_(Journal.journal.like(search+"%"),
                                Journal.abbrev.like(search+"%")))\
                 .all()
     current_app.logger.debug(journals)
-   
+
     return jsonify(results=[x.journal for x in journals])
 
 
@@ -299,7 +299,7 @@ def genus_autocomplete():
 @login_required
 @require_admin
 def resolve_problem(ds_id, prob_id):
-    
+
     # Get all the necessary data from the database
     problem = Problem.query.get_or_404(prob_id)
     article = CheckerArticle.query.get_or_404(problem.article_id)
@@ -322,7 +322,7 @@ def resolve_problem(ds_id, prob_id):
         next_problem_id = None
     else:
         next_problem_id = dataset.problems[next_problem_idx].id
-    
+
     form = None
     npa_compounds = None
     if problem.problem == "journal":
@@ -330,7 +330,7 @@ def resolve_problem(ds_id, prob_id):
     elif problem.problem == "genus":
         form = genus_form_factory(compound)
     elif (problem.problem == "flat_match" or problem.problem == "duplicate"
-          or problem.problem == "name_match"):
+          or problem.problem == "name_match" or problem.problem == "internal_duplicate"):
         # Need to make sure connected to NP Atlas
         conn_string = current_app.config.get("ATLAS_DATABASE_URI", None)
         atlasdb.dbInit(conn_string)
@@ -344,7 +344,7 @@ def resolve_problem(ds_id, prob_id):
         form = simple_problem_form_factory(problem, article)
 
     force = form.force.data
-    if (form.validate_on_submit() or force or 
+    if (form.validate_on_submit() or force or
         (form.is_submitted() and form.reject.data)):
         if form.reject.data:
             article.article.is_nparticle = False
@@ -380,7 +380,7 @@ def resolve_problem(ds_id, prob_id):
                             prob_id=next_problem_id))
         else:
             return redirect(url_for('checker.problem_list', ds_id=ds_id))
-    
+
     else:
         flash_errors(form)
 
@@ -433,7 +433,7 @@ def create_string_form(value, type_):
 
 
 def journal_form_factory(article):
-    return JournalForm(value=article.journal, 
+    return JournalForm(value=article.journal,
                        new_journal_full=article.journal,
                        alt_journal=article.journal)
 
@@ -494,7 +494,7 @@ def get_npa_compounds(compound):
 
 
 def save_resolve_data(form, article, compound):
-    # Check form in simple classes 
+    # Check form in simple classes
     # These changes are all article data
     if form.__class__.__name__ in ["SimpleIntForm", "SimpleStringForm"]:
         attribute = form.type_.data
@@ -584,7 +584,7 @@ def save_compound(form, article, compound):
         flash(option)
         abort(500)
 
-    commit()    
+    commit()
 
 def run_standardization(dataset_id):
     dataset = Dataset.query.get_or_404(dataset_id)
