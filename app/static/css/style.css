@@ -68,6 +68,10 @@ input {
     border: solid thin #D6DBDF;
 }
 
+.compound-menu-checkbox {
+    transform: scale(1.5);
+}
+
 .form-horizontal .control-label.text-left{
     text-align: left;
 }
@@ -301,6 +305,10 @@ div.scrollmenu button {
 }
 
 #addCompound {
+    margin: 0px 0px 5px;
+}
+
+#replaceSource {
     margin: 0px 0px 5px;
 }
 
