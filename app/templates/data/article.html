@@ -95,21 +95,25 @@
                 <hr class="full-divider">
 
                 <div data-toggle="fieldset" id="compound-fieldset">
-                        <button type="button" class="btn btn-primary" id="addCompound">
-                            <span class="fas fa-plus"></span> Add Compound
+                    <button type="button" class="btn btn-primary" id="addCompound">
+                        <span class="fas fa-plus"></span> Add Compound
+                    </button>
+                    <!-- <div class="dropdown" style="padding-bottom: 2px"> -->
+                    <div style="padding-bottom: 2px">
+                        <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#compoundMenuCollapse" id="compoundMenuBtn">
+                          Curated Compounds (<span id="compoundMenuBtnCount">0</span>) <i class="fas fa-angle-down"></i>
                         </button>
-                        <div class="dropdown" style="padding-bottom: 2px">
-                            <button class="btn btn-secondary dropdown-toggle" type="button" data-toggle="dropdown" id="compoundMenuBtn">
-                            Curated Compounds (#)<span class="caret"></span></button>
-                            <ul class="dropdown-menu scrollmenu " id="compoundMenu">
-                                 <!-- Leave this blank and add items with jQuery -->
-                            </ul>
+                        <div class="collapse" id="compoundMenuCollapse">
+                          <ul class="scrollmenu " id="compoundMenu" style="list-style: none">
+                               <!-- Leave this blank and add items with jQuery -->
+                          </ul>
                         </div>
+                    </div>
 
-                        <div class="scrollmenu" id="tabDiv">
-                            <!-- Leave this blank and add tabs with jQuery -->
-                        </div>
-
+                    <div class="scrollmenu" id="tabDiv">
+                        <!-- Leave this blank and add tabs with jQuery -->
+                    </div>
+                    <div id="multipleNotice" style="display:none"><h5>Multiple Compounds Selected</h5></div>
                     {% for compound in form.compounds %}
                         <div data-toggle="fieldset-entry" class="compound-row" id="compound-row-{{ loop.index0 }}" >
                             <div class="row">

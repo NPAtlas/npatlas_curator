@@ -279,11 +279,11 @@ div.scrollmenu button {
 }
 
 .compound-menu {
-    width: 100%;
+    width: 90%;
+    /* height: 24px; */
     background-color: #D6DBDF;
     border: none;
     color: black;
-    padding: 5px 32px;
     text-align: center;
     text-decoration: none;
     display: inline-block;
@@ -294,6 +294,10 @@ div.scrollmenu button {
 
 .compound-menu:hover {
     background-color: rgb(174, 179, 184);
+}
+
+.compound-tab {
+    height: 48px;
 }
 
 #addCompound {

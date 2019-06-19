@@ -54,7 +54,7 @@ def curator_dashboard(cur_id):
             methods=['GET', 'POST'])
 @login_required
 def trainingscore(cur_id, ds_id):
-    """Score and render training set diffs at 
+    """Score and render training set diffs at
        '/data/curator<int:id>/dataset<int:ds_id>/traningset'
     """
     # Get dataset
@@ -336,7 +336,7 @@ def add_compound():
     # Send back json with url to redirect
     return jsonify({'url': currentUrl})
 
-@data.route('/data/delCompound', methods=['POST'])
+@data.route('/data/delCompounds', methods=['POST'])
 @login_required
 def delete_compound():
     # Clear session cookie
@@ -346,19 +346,23 @@ def delete_compound():
     currentUrl = data['url'].strip('/')
     urlSplit = currentUrl.split('/')
     art_id = int(urlSplit[-1].strip('article'))
-    comp_id = int(data['compId'])
+    comp_ids = data['compIds']
     # Get article from DB
     article = Article.query.get_or_404(art_id)
     article = save_data_to_article(article, data)
-    # Get compound from DB
-    compound = Compound.query.get_or_404(comp_id)
-    # Compound index in article
-    idx = article.compounds.index(compound)
-    article.compounds.pop(idx)
+    for comp_id in comp_ids:
+        # Get compound from DB
+        compound = Compound.query.get_or_404(comp_id)
+        # Compound index in article
+        idx = article.compounds.index(compound)
+        article.compounds.pop(idx)
     try_dbcommit()
 
     # Store session cookie as compound before deleted
-    session['compound'] = idx - 1 if idx > 1 else 0
+    if len(comp_ids) > 1:
+        session['compound'] = 0
+    else:
+        session['compound'] = idx - 1 if idx > 1 else 0
 
     return jsonify({'url': currentUrl})
 

@@ -60,13 +60,30 @@ $(document).ready(() => {
         $("#tabDiv").append(btnString);
 
         // Menu Items
-        let menuItemString = "<li role='presentation'><button class='compound-menu' role='menuitem' id='compound-menu-"+rowNum+"' type=button>";
-        menuItemString = menuItemString + compoundName + "</a></li>";
+        let menuItemString = `<li role='presentation'>
+        <div class='input-group mb3'>
+          <div class='input-group-prepend'>
+            <div class='input-group-text'>
+              <input type='checkbox' class='compound-menu-checkbox' 
+                id='compound-menu-${rowNum}-checkbox' onclick='handleCheckbox(this);'
+                value='${rowNum}'
+              >
+            </div>
+          </div>
+          <button type='button' class='compound-menu' id='compound-menu-${rowNum}'>${compoundName}</button>
+        </div>
+        </li>`;
+
         $("#compoundMenu").append(menuItemString);
     });
 
     // Show correct # of compounds on menu
     updateMenuCount();
+
+    // Data-collapse toggle icon
+    $("#compoundMenuBtn").on('click', function() {
+      $("i", this).toggleClass("fa-angle-down fa-angle-up");
+    });
 
     // Hide all but first for compound field unless just added new compound
     // If new compound (catching by error), show that one
@@ -316,9 +333,9 @@ String.prototype.format = function () {
   };
 
 function updateMenuCount() {
-    let $this = $("#compoundMenuBtn");
+    let $this = $("#compoundMenuBtnCount");
     let n = $(".compound-menu").length;
-    $this.text("Curated Compounds ({})".format(n));
+    $this.text(n);
 }
 
 function scrolltabDiv(rowNum) {
@@ -342,10 +359,22 @@ function scrolltabDiv(rowNum) {
 }
 
 function deleteCompound(currentPath, compId) {
+    var compIds = [];
+    var temp;
     if ($(".compound-row").length == 1) {
         alert("Cannot delete every compound from an article. Please add a real compound before deleting this one.");
         return;
     }
+    // Handle case where checkboxes are selected
+    if (checkedBoxes.length > 0) {
+      checkedBoxes.forEach(x => {
+        temp = $("#compounds-{}-id".format(x)).val();
+        compIds.push(temp)
+      })
+    } else {
+      compIds = [compId]
+    }
+    console.log(compIds)
     // Need to save article data and send to POST
     let article = {
         pmid: $("#pmid").val(),
@@ -377,9 +406,9 @@ function deleteCompound(currentPath, compId) {
     });
     // Send POST
     $.ajax({
-        url: "/data/delCompound",
+        url: "/data/delCompounds",
         type: "POST",
-        data: JSON.stringify({url: currentPath, compounds: compounds, article: article, compId: compId}),
+        data: JSON.stringify({url: currentPath, compounds: compounds, article: article, compIds: compIds}),
         contentType: "application/json; charset=utf-8",
         success: function(retJson) {
                 if (retJson.url) {
@@ -442,4 +471,32 @@ function displayAJAX(smi, idx) {
             alert("Unable to process SMILES.");
         }
     });
+}
+
+var checkedBoxes = [];
+function handleCheckbox(checkbox) {
+  let temp = [];
+  if (checkbox.checked)
+    checkedBoxes.push(checkbox.value);
+  else {
+    temp = checkedBoxes.filter(x => x!==checkbox.value);
+    checkedBoxes = temp;
+  }
+  handleCheckedBoxes();
+}
+
+function handleCheckedBoxes() {
+  if (checkedBoxes.length > 0) {
+    // Disable dropdown up
+    $("#compoundMenuBtn").prop('disabled', true);
+    let temp_html = $("#delCompound").html();
+    if (!temp_html.includes("Multiple Compounds"))
+      $("#delCompound").html(temp_html + " Multiple Compounds")
+    $("#multipleNotice").show();
+  } else {
+    $("#compoundMenuBtn").prop('disabled', false);
+    let temp_html = $("#delCompound").html();
+    $("#delCompound").html(temp_html.replace(" Multiple Compounds", ""));
+    $("#multipleNotice").hide();
+  }
 }
