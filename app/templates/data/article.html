@@ -16,6 +16,11 @@
     {% endfor %}
   {% endif %}
 {% endwith %}
+<!-- Replace Source Organism -->
+<div id="dialog-source" title="Replace Source Organism" style="display:none">
+  <p class="text-center">Replace Source Organism for all Compounds</p>
+  <input type="text" class="form-control" id="source-replace">
+</div>
 <!-- Delete NPAID compound confirmation -->
 <div id="dialog-confirm" title="Delete Compound?" style="display: none">
     <p class="text-center"><i class="fas fa-exclamation-triangle fa-3x red"></i></p>
@@ -98,6 +103,9 @@
                     <button type="button" class="btn btn-primary" id="addCompound">
                         <span class="fas fa-plus"></span> Add Compound
                     </button>
+                    <button type="button" class="btn btn-secondary" id="replaceSource">
+                        Replace Source Organism
+                    </button>
                     <!-- <div class="dropdown" style="padding-bottom: 2px"> -->
                     <div style="padding-bottom: 2px">
                         <button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#compoundMenuCollapse" id="compoundMenuBtn">
@@ -141,7 +149,7 @@
                                     </div>
                                     <div class="form-group">
                                         {{ compound.form.source_organism.label(class_="control-label text-left") }}
-                                        {{ compound.form.source_organism(class_="form-control") }}
+                                        {{ compound.form.source_organism(class_="form-control source_organism") }}
                                     </div>
                                 </div>
                             </div>

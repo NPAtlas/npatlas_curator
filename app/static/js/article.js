@@ -318,6 +318,27 @@ $(document).ready(() => {
             deleteCompound(currentPath, compId);
         }
     });
+
+    $("#replaceSource").on("click", function() {
+      $("#dialog-source").dialog({
+          resizable: false,
+          height: "auto",
+          width: "auto",
+          modal: true,
+          buttons: {
+            "Confirm": function() {
+              let newValue = $("#source-replace").val();
+              if (newValue.length < 1)
+                return
+              replaceSource(newValue);
+              $(this).dialog('close');
+            },
+            Cancel: function() {
+              $(this).dialog('close');
+            }
+          }
+      });
+    });
 // END jQUERY DOC READY
 });
 
@@ -499,4 +520,10 @@ function handleCheckedBoxes() {
     $("#delCompound").html(temp_html.replace(" Multiple Compounds", ""));
     $("#multipleNotice").hide();
   }
+}
+
+function replaceSource(newValue) { 
+  $(".source_organism").each(function() {
+    this.value = newValue;
+  })
 }
