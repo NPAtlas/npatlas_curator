@@ -410,7 +410,9 @@ def save_data_to_article(article, data):
     actual_cmpds = []
     for cmpd in data['compounds']:
         cmpd = NoneDict(cmpd)
-        db_cmpd = None
+        # Create temporary Compound object in case there all compounds were 
+        # deleted from the article before
+        db_cmpd = Compound()
         if cmpd['id']:
             db_cmpd = Compound.query.get_or_404(cmpd['id'])
 
