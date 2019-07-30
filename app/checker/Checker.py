@@ -235,6 +235,7 @@ class Checker(object):
         reg_name.regularize_name()
 
         # Currently not standardizing because it takes ~10x longer
+        # compounds are pre-standardized
         reg_compound = Compound(
             db_compound.smiles,
             name=reg_name.get_name(),
@@ -256,7 +257,8 @@ class Checker(object):
                 source_species=species,
                 npaid=db_compound.npaid
             )
-            self.parse_external_ids(check_compound, db_compound)
+            # Need more robust solution
+            # self.parse_external_ids(check_compound, db_compound)
 
             db_add_commit(check_compound)
         else:
