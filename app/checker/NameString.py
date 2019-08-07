@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 import re
 
-NOT_NAMED_SYNONYMS = ('unknown', 'not named', 'no name', 'unnamed', 'none',)
+NOT_NAMED_SYNONYMS = ('unknown', 'not named', 'no name', 'unnamed', 'none', 
+                      'unnamed compound')
 SUFFIX_LIST = ('Acid', 'Ester', 'Acetate', 'Butyrate', 'Anhydride',
                'Dimer', 'Methyl', 'Ethyl', 'Aglycon', 'Aglycone')
 
