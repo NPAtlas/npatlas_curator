@@ -46,6 +46,7 @@
                             </td>
                         {% endif %}
                     {% else %}
+                        <a href="{{ url_for('admin.edit_dataset', id=dataset.id) }}">Dataset Admin</a>
                         <a href="{{ url_for('data.dataset', cur_id=dataset.get_curator_id(), ds_id=dataset.id) }}">
                             See Dataset
                         </a>

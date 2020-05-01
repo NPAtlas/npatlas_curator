@@ -15,6 +15,6 @@
         <h1>Edit Curator</h1>
     {% endif %}
     <br/>
-    {{ wtf.quick_form(form) }}
+    {{ wtf.quick_form(form, button_map={'submit': 'primary'}) }}
 </div>
 {% endblock %}

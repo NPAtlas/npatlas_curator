@@ -30,3 +30,4 @@ requests
 celery
 redis
 pubchempy
+email_validator

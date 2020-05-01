@@ -18,3 +18,5 @@ certs/
 # Insertion logs
 insert_logs/
 temp.py
+
+npatlas_curator.sql

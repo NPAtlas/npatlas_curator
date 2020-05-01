@@ -9,7 +9,7 @@ from .. import db
 from ..data import data
 from ..data.forms import ArticleForm, CompoundForm
 from ..models import Article, Compound, Curator, Dataset
-from .forms import CuratorForm
+from .forms import CuratorForm, DatasetForm
 
 
 def require_admin(func):
@@ -198,3 +198,32 @@ def edit_curator(id):
     return render_template('admin/curators/curator.html', action="Edit",
                            add_curator=add_curator, form=form,
                            title='Edit Curator')
+
+
+@admin.route('/admin/datasets/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+@require_admin
+def edit_dataset(id):
+    """
+    Edit a dataset curator or instructions
+    """
+    dataset = Dataset.query.get_or_404(id)
+    curators = Curator.query.order_by('id').all()
+    form = DatasetForm(obj=dataset)
+
+    if form.validate_on_submit():
+        dataset.curator_id = form.curator_id.data
+        dataset.instructions = form.instructions.data
+        try:
+            db.session.commit()
+            flash('You have successfully editted the Dataset')
+        except:
+            db.session.rollback()
+            flash("Error: could not edit Dataset")
+
+        return redirect(url_for('admin.list_datasets'))
+
+    form.curator_id.choices = [(c.id, c.full_name) for c in curators]
+    form.instructions.data = dataset.instructions
+
+    return render_template('admin/edit_dataset.html', form=form)

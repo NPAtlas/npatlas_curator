@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, SelectField
 from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
 
 from ..models import Curator
@@ -24,3 +24,12 @@ class CuratorForm(FlaskForm):
     # def validate_user(self, field):
     #     if Curator.query.filter_by(username=field.data).first():
     #         raise ValidationError('Username is already in use.')
+
+
+class DatasetForm(FlaskForm):
+    """
+    For admin to edit / assign datasets
+    """
+    instructions = StringField('Instructions')
+    curator_id = SelectField("Curator", coerce=int, validate_choice=False)
+    submit = SubmitField('Submit Dataset')

@@ -1,0 +1,10 @@
+{% extends "base.html" %} 
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}Data Dashboard{% endblock %} 
+{% block body %}
+<div class="container">
+  <h1 style="text-align: center;">Edit Dataset</h1>
+  {{ wtf.quick_form(form, button_map={'submit': 'primary'}) }}
+</div>
+
+{% endblock %}

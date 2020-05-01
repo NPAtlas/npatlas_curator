@@ -20,6 +20,12 @@ class Curator(UserMixin, db.Model):
     is_admin = db.Column(db.Boolean, default=False)
 
     @property
+    def full_name(self):
+        fname = self.first_name or ""
+        lname = self.last_name or ""
+        return fname + " " + lname
+
+    @property
     def password(self):
         """
         Prevent password from being accessed
@@ -48,7 +54,7 @@ def load_user(user_id):
     return Curator.query.get(int(user_id))
 
 
-# Define dataset_article, article_compound, and dataset_problem 
+# Define dataset_article, article_compound, and dataset_problem
 # many-to-many relationships
 dataset_article = db.Table(
     'dataset_article',
@@ -105,9 +111,9 @@ class Dataset(db.Model):
         Send a zero if not assigned - useful for admin access to data
         """
         return self.curator.id if self.curator else 0
-    
+
     def standard_running(self):
-        return (not self.checker_dataset.standardized and 
+        return (not self.checker_dataset.standardized and
                 not self.checker_dataset.completed
                 if self.checker_dataset else False)
 
@@ -120,7 +126,7 @@ class Dataset(db.Model):
         """
         Boolean return if checker dataset exists and has completed checking
         """
-        return (self.checker_dataset.standardized and 
+        return (self.checker_dataset.standardized and
                 self.checker_dataset.completed
                 if self.checker_dataset else False)
 
@@ -313,7 +319,7 @@ class Genus(db.Model):
     genustype = db.Column(db.String(55))
     # One-to-many relationship with Alternative Genera
     altgenera = db.relationship('AltGenus', backref='genus')
-    
+
     @staticmethod
     def check_genus_match(genus_name):
         genus_match = Genus.query.filter_by(genus=genus_name).first()
