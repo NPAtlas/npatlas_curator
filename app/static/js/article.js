@@ -11,7 +11,8 @@ $(document).ready(() => {
       });
 
     // variables
-    const regex = /^10.\d{4,9}\//g;
+    const doi_link_regex = /^((https?:\/\/)?(dx\.)?doi\.org\/|doi:\s*)/gi
+    const doi_regexp = /^10\.\d{4,9}\//g;
     var currentPath = window.location.pathname;
 
     // Define Kekule Toolbar preset
@@ -170,7 +171,7 @@ $(document).ready(() => {
     });
 
     // DOI Linkout
-    if ($("input[id='doi']").val().match(regex)) {
+    if ($("input[id='doi']").val().match(doi_regexp)) {
         let link = "https://doi.org/" + $("input[id='doi']").val();
         $("#doi-link").attr("href", link).show();
     }
@@ -179,9 +180,13 @@ $(document).ready(() => {
     $("input[id='doi']").on("keyup", function() {
         // console.log($(this));
         let doi = $(this).val();
+        if (doi.match(doi_link_regex)) {
+            doi = doi.replace(doi_link_regex, "");
+            $(this).val(doi);
+        }
         // console.log(doi);
         $target = $("#doi-link");
-        if (doi.match(regex)) {
+        if (doi.match(doi_regexp)) {
             let link = "https://doi.org/" + doi;
             $target.attr("href", link).show();
         } else {
