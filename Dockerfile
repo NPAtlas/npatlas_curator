@@ -8,7 +8,7 @@
 # If you prefer miniconda:
 FROM continuumio/miniconda3
 
-LABEL Name=curator Version=0.3.1
+LABEL Name=curator Version=3.0.1
 WORKDIR /curator
 COPY requirements.txt /curator
 # Using pip:

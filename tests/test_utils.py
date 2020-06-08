@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-import sys
-sys.path.append("..")
 import unittest
 from time import sleep
 
@@ -10,6 +8,7 @@ from app.utils.pubchem_smiles_standardizer import get_standardized_smiles
 
 import traceback
 from unittest.case import _AssertRaisesContext
+
 
 class _AssertNotRaisesContext(_AssertRaisesContext):
     def __exit__(self, exc_type, exc_value, tb):
@@ -22,8 +21,7 @@ class _AssertNotRaisesContext(_AssertRaisesContext):
                 exc_name = str(self.expected)
 
             if self.obj_name:
-                self._raiseFailure("{} raised by {}".format(exc_name,
-                    self.obj_name))
+                self._raiseFailure("{} raised by {}".format(exc_name, self.obj_name))
             else:
                 self._raiseFailure("{} raised".format(exc_name))
 
@@ -32,13 +30,15 @@ class _AssertNotRaisesContext(_AssertRaisesContext):
 
         return True
 
+
 class MyTestCase(unittest.TestCase):
     def assertNotRaises(self, expected_exception, *args, **kwargs):
         context = _AssertNotRaisesContext(expected_exception, self)
         try:
-            return context.handle('assertNotRaises', args, kwargs)
+            return context.handle("assertNotRaises", args, kwargs)
         finally:
             context = None
+
 
 class TestNoneDict(MyTestCase):
     def setUp(self):
@@ -59,10 +59,9 @@ class TestNoneDict(MyTestCase):
 
 
 class TestTimeout(MyTestCase):
-
     @exit_after(1)
     def timein(self, cs):
-        counter = 0.
+        counter = 0.0
         while counter < cs:
             sleep(0.1)
             counter += 0.1
@@ -74,9 +73,7 @@ class TestTimeout(MyTestCase):
         self.assertNotRaises(KeyboardInterrupt, self.timein, 0.5)
 
 
-
 class TestPubChemStandardize(unittest.TestCase):
-
     def test_invalid_smiles_empty(self):
         smiles = ""
         self.assertRaises(TypeError, get_standardized_smiles, smiles)

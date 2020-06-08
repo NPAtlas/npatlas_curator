@@ -1,16 +1,26 @@
 import logging
 import re
 
-from .. import db
-from ..models import (CheckerArticle, CheckerCompound, CheckerDataset, Dataset,
-                      Genus, Journal, Problem, Retraction)
-from ..utils import pubchem_search
-from ..utils.atlasdb import atlasdb
-from ..utils.Compound import Compound, inchikey_from_smiles
-from .NameString import NameString, decapitalize_first
-from .ResolveEnum import ResolveEnum
+from app import db
+from app.models import (
+    CheckerArticle,
+    CheckerCompound,
+    CheckerDataset,
+    Dataset,
+    Genus,
+    Journal,
+    Problem,
+    Retraction,
+)
+from app.utils import pubchem_search
+from app.utils.atlasdb import atlasdb
+from app.utils import atlas_api
+from app.utils.Compound import Compound, inchikey_from_smiles
+from app.checker.NameString import NameString, decapitalize_first
+from app.checker.ResolveEnum import ResolveEnum
 
 # This unit contains far too much tight coupling between checker and flask app
+
 
 class Checker(object):
     # Hacky solution to keeping URI in config file
@@ -18,8 +28,10 @@ class Checker(object):
     try:
         import sys
         import warnings
+
         sys.path.append("../..")
         from instance.config import ATLAS_DATABASE_URI
+
         # suppress annoying MariaDB version warning
         with warnings.catch_warnings():
             warnings.simplefilter("ignore")
@@ -39,12 +51,10 @@ class Checker(object):
     def update_status(self, current, total, status):
         if self.task:
             self.task.update_state(
-                state='PROGRESS',
-                meta={'current': current, 'total': total,
-                    'status': status}
+                state="PROGRESS",
+                meta={"current": current, "total": total, "status": status},
             )
-        self.logger.info("PROGRESS: {}/{}\nStatus: {}"\
-                .format(current, total, status))
+        self.logger.info("PROGRESS: {}/{}\nStatus: {}".format(current, total, status))
 
     def run(self, standardize_compounds=False, restart=False):
         self.logger.info("Setting up dataset")
@@ -57,10 +67,9 @@ class Checker(object):
             if self.check_reject_article(article):
                 article.is_nparticle = False
                 commit()
-            
+
             # Skip over articles which are not properly curated
-            if (not article.completed or article.needs_work 
-                or not article.is_nparticle):
+            if not article.completed or article.needs_work or not article.is_nparticle:
                 self.logger.warning("Skipping article {}!".format(article.id))
                 continue
 
@@ -71,15 +80,21 @@ class Checker(object):
 
             for compound in article.compounds:
                 check_compound = self.create_checker_compound(
-                    compound, standardize=standardize_compounds,
-                    restart=restart)
-                if check_compound.inchikey not in self.checked_compound_inchikeys.keys():
-                    self.checked_compound_inchikeys[check_compound.inchikey] = [check_compound.id]
+                    compound, standardize=standardize_compounds, restart=restart
+                )
+                if (
+                    check_compound.inchikey
+                    not in self.checked_compound_inchikeys.keys()
+                ):
+                    self.checked_compound_inchikeys[check_compound.inchikey] = [
+                        check_compound.id
+                    ]
                 else:
-                    self.checked_compound_inchikeys[check_compound.inchikey].append(check_compound.id)
+                    self.checked_compound_inchikeys[check_compound.inchikey].append(
+                        check_compound.id
+                    )
                 self.check_compound(check_compound)
                 # Add the checked list after checking complete
-
 
         self.logger.info("Done checking!")
         self.logger.info("There are %d problems to review", len(self.review_list))
@@ -98,7 +113,7 @@ class Checker(object):
                 dataset_id=self.dataset_id,
                 problem=corr.problem,
                 article_id=corr.article_id,
-                compound_id=corr.compound_id
+                compound_id=corr.compound_id,
             )
 
             db_add_commit(prob)
@@ -121,8 +136,11 @@ class Checker(object):
             commit()
 
     def check_reject_article(self, article):
-        return (bool(Retraction.query.filter_by(article_doi=article.doi).all())
-                if article.doi else None)
+        return (
+            bool(Retraction.query.filter_by(article_doi=article.doi).all())
+            if article.doi
+            else None
+        )
 
     def check_compound(self, checker_compound):
         """
@@ -142,8 +160,11 @@ class Checker(object):
             id_list = self.checked_compound_inchikeys.get(checker_compound.inchikey)
             if len(id_list) != 1:
                 self.logger.error("Internal redundancy of compounds!")
-                self.add_problem(checker_compound.get_article_id(), "internal_duplicate",
-                             comp_id=checker_compound.id)
+                self.add_problem(
+                    checker_compound.get_article_id(),
+                    "internal_duplicate",
+                    comp_id=checker_compound.id,
+                )
 
             # Branch 2 - potentially new compound
             if not checker_compound.npaid:
@@ -151,28 +172,43 @@ class Checker(object):
                 # First find connectivity matches
                 if self.compound_flat_match(checker_compound):
                     if self.compound_full_match(checker_compound):
-                        self.add_problem(checker_compound.get_article_id(), "duplicate",
-                                        comp_id=checker_compound.id)
-                # Impose strict verification for flat matches
+                        self.add_problem(
+                            checker_compound.get_article_id(),
+                            "duplicate",
+                            comp_id=checker_compound.id,
+                        )
+                    # Impose strict verification for flat matches
                     else:
-                        self.add_problem(checker_compound.get_article_id(), "flat_match",
-                                        comp_id=checker_compound.id)
+                        self.add_problem(
+                            checker_compound.get_article_id(),
+                            "flat_match",
+                            comp_id=checker_compound.id,
+                        )
                 # Check for name match (ignores "Not named")
                 if self.compound_name_match(checker_compound):
-                    self.add_problem(checker_compound.get_article_id(), "name_match",
-                                    comp_id=checker_compound.id)
+                    self.add_problem(
+                        checker_compound.get_article_id(),
+                        "name_match",
+                        comp_id=checker_compound.id,
+                    )
             # Branch 1 - recurated compound
             # Only check if the structure has changed
             elif checker_compound.npaid:
                 # Check if structure has changed
                 if self.npaid_changed(checker_compound):
                     if self.compound_full_match(checker_compound):
-                        self.add_problem(checker_compound.get_article_id(), "duplicate",
-                                        comp_id=checker_compound.id)
+                        self.add_problem(
+                            checker_compound.get_article_id(),
+                            "duplicate",
+                            comp_id=checker_compound.id,
+                        )
                     # Impose strict verification for flat matches
                     else:
-                        self.add_problem(checker_compound.get_article_id(), "flat_match",
-                                        comp_id=checker_compound.id)
+                        self.add_problem(
+                            checker_compound.get_article_id(),
+                            "flat_match",
+                            comp_id=checker_compound.id,
+                        )
                 else:
                     checker_compound.resolve = ResolveEnum.update.value
 
@@ -180,11 +216,13 @@ class Checker(object):
         commit()
 
     def check_reject_compound(self, compound):
-        res = Retraction.query.filter(Retraction.compound_inchikey==compound.inchikey)\
-                .all()
+        res = Retraction.query.filter(
+            Retraction.compound_inchikey == compound.inchikey
+        ).all()
         if not res:
-            res = Retraction.query.filter(Retraction.compound_name==compound.name)\
-                    .all()
+            res = Retraction.query.filter(
+                Retraction.compound_name == compound.name
+            ).all()
         return bool(res)
 
     @staticmethod
@@ -206,7 +244,7 @@ class Checker(object):
                 pages=article.pages,
                 authors=article.authors,
                 title=article.title,
-                abstract=article.abstract
+                abstract=article.abstract,
             )
 
             db_add_commit(check_art)
@@ -215,15 +253,21 @@ class Checker(object):
 
         return check_art
 
-    def create_checker_compound(self, db_compound, standardize=False, 
-                                restart=False):
+    def create_checker_compound(self, db_compound, standardize=False, restart=False):
         # If restarting check if anything was changed in the dataset
         restart_changed = False
-        if restart and db_compound.checker_compound and not db_compound.checker_compound.resolve:
-            if inchikey_from_smiles(db_compound.smiles) != db_compound.checker_compound.inchikey:
+        if (
+            restart
+            and db_compound.checker_compound
+            and not db_compound.checker_compound.resolve
+        ):
+            if (
+                inchikey_from_smiles(db_compound.smiles)
+                != db_compound.checker_compound.inchikey
+            ):
                 self.logger.warning("Re-creating compound because structure changed!")
                 restart_changed = True
-            
+
         # Start fresh if not restarting
         if (db_compound.checker_compound and not restart) or restart_changed:
             db.session.delete(db_compound.checker_compound)
@@ -237,9 +281,7 @@ class Checker(object):
         # Currently not standardizing because it takes ~10x longer
         # compounds are pre-standardized
         reg_compound = Compound(
-            db_compound.smiles,
-            name=reg_name.get_name(),
-            standardize=standardize
+            db_compound.smiles, name=reg_name.get_name(), standardize=standardize
         )
         reg_compound.cleanStructure()
 
@@ -255,7 +297,7 @@ class Checker(object):
                 molblock=reg_compound.molblock,
                 source_genus=genus,
                 source_species=species,
-                npaid=db_compound.npaid
+                npaid=db_compound.npaid,
             )
             # Need more robust solution
             # self.parse_external_ids(check_compound, db_compound)
@@ -267,9 +309,10 @@ class Checker(object):
         return check_compound
 
     @staticmethod
-    def get_checker_compound_cid(checker_compound):  
+    def get_checker_compound_cid(checker_compound):
         checker_compound.pubchem_id = pubchem_search.get_cid_from_inchikey(
-            checker_compound.inchikey)
+            checker_compound.inchikey
+        )
 
     @staticmethod
     def parse_external_ids(checker_compound, db_compound):
@@ -290,18 +333,15 @@ class Checker(object):
         """
         level = kwargs.get("level", "INFO")
         logging.basicConfig(
-            format='%(levelname)s: %(message)s',
-            level=logging.getLevelName(level)
+            format="%(levelname)s: %(message)s", level=logging.getLevelName(level)
         )
 
     def add_problem(self, art_id, problem, comp_id=None):
-        self.review_list.append(
-                Correction(art_id, problem, comp_id)
-        )
+        self.review_list.append(Correction(art_id, problem, comp_id))
 
     ## Start Checker Rules
     def check_doi(self, checker_article):
-        regexp = re.compile(r'^(10.\d{4,9})\/([-._;()/:+A-Za-z0-9]+)$')
+        regexp = re.compile(r"^(10.\d{4,9})\/([-._;()/:+A-Za-z0-9]+)$")
         if checker_article.doi:
             # if re.search(r'^(http|dx|doi)', checker_article.doi):
             checker_article.doi = clean_doi(checker_article.doi)
@@ -313,7 +353,7 @@ class Checker(object):
         # Make sure integer
         # This is enforced by datatype in DB
         pass
-        
+
     def check_journal(self, checker_article):
         journal = Journal.check_journal_match(checker_article.journal)
         if journal:
@@ -321,66 +361,65 @@ class Checker(object):
             checker_article.journal_abbrev = journal.abbrev
         else:
             self.add_problem(checker_article.id, "journal")
-        
+
     def check_year(self, checker_article):
         # Make sure year string is valid
-        match = re.match('^[1-2][0-9]{3}$', str(checker_article.year))
+        match = re.match("^[1-2][0-9]{3}$", str(checker_article.year))
         if not match:
             self.add_problem(checker_article.id, "year")
-        
+
     def check_volume(self, checker_article):
         # > 6 characters or special characters FLAG
         if checker_article.volume:
             if len(checker_article.volume) > 6:
                 self.add_problem(checker_article.id, "volume")
-        
+
     def check_issue(self, checker_article):
         # > 6 characters or special characters FLAG
         if checker_article.issue:
             if len(checker_article.issue) > 6:
                 self.add_problem(checker_article.id, "issue")
-        
+
     def check_pages(self, checker_article):
-    # only first pages #s INT < 100,000
-    # INT-INT
-    # or alphabetical characters
-    # Watchout for en dash and em dash
+        # only first pages #s INT < 100,000
+        # INT-INT
+        # or alphabetical characters
+        # Watchout for en dash and em dash
         pages = checker_article.pages
         if pages:
             pages = re.sub(u"\u2013|\u2014", "-", pages)
-            if re.search('^[0-9]',pages):
-                res = [x.strip() for x in pages.split('-') if x]
+            if re.search("^[0-9]", pages):
+                res = [x.strip() for x in pages.split("-") if x]
                 res = clean_num_pages(res)
                 # Add problem if any string is greater than 6 characters
                 if [x for x in res if len(x) > 6]:
                     self.add_problem(checker_article.id, "pages")
                 else:
-                    checker_article.pages = '-'.join(res)
-            elif re.search('^[A-Za-z]', pages):
+                    checker_article.pages = "-".join(res)
+            elif re.search("^[A-Za-z]", pages):
                 # Do nothing for now
                 # max length = 10
                 pass
             else:
                 # Check pages if they don't start with Alphanumeric char
                 self.add_problem(checker_article.id, "pages")
-        
+
     def check_authors(self, checker_article):
         # at least 6 char, no numbers
-        if (len(checker_article.authors) < 6 or
-            has_numbers(checker_article.authors)):
+        if len(checker_article.authors) < 6 or has_numbers(checker_article.authors):
             self.add_problem(checker_article.id, "authors")
 
     def check_title(self, checker_article):
         # at least > 6 char
-        if (len(checker_article.title) < 6):
+        if len(checker_article.title) < 6:
             self.add_problem(checker_article.id, "title")
 
     def check_abstract(self, checker_article):
-        # If abstract, should be min 10 char 
+        # If abstract, should be min 10 char
         # Probably should be more!
         # "No abstract" is common
         if checker_article.abstract:
-            if (len(checker_article.abstract) < 20):
+            if len(checker_article.abstract) < 20:
                 self.add_problem(checker_article.id, "abstract")
 
     def check_source_organism(self, checker_compound):
@@ -389,8 +428,9 @@ class Checker(object):
             checker_compound.source_genus = genus.genus
         else:
 
-            self.add_problem(checker_compound.get_article_id(), "genus",
-                             comp_id=checker_compound.id)
+            self.add_problem(
+                checker_compound.get_article_id(), "genus", comp_id=checker_compound.id
+            )
 
     def check_article_duplicate(self, check_article):
         if not check_article.npa_artid:
@@ -409,56 +449,43 @@ class Checker(object):
 
     def compound_flat_match(self, compound):
         """
-        Query NP Atlas DB to see if there is a flat match
-        Return boolean match 
+        Query NP Atlas API to see if there is a flat match
+        Return boolean match
         """
-        sess = self.atlasdb.startSession()
-        res = sess.query(atlasdb.Compound)\
-            .filter(atlasdb.Compound.inchikey.startswith(compound.inchikey.split('-')[0]))\
-            .first()
-        sess.close()
+        res = atlas_api.search_inchikey(compound.inchikey.split("-")[0])
         return bool(res)
 
     def compound_full_match(self, compound):
         """
-        Query NP Atlas DB to see if there is a full match
-        Return boolean match 
+        Query NP Atlas API to see if there is a full match
+        Return boolean match
         """
-        sess = self.atlasdb.startSession()
-        res = sess.query(atlasdb.Compound)\
-            .filter(atlasdb.Compound.inchikey == compound.inchikey)\
-            .first()
-        sess.close()
+        res = atlas_api.search_inchikey(compound.inchikey)
         return bool(res)
 
     def compound_name_match(self, compound):
         """
         Query NP Atlas DB to see if there is a name match
-        Return boolean match 
+        Return boolean match
         """
         res = None
         if compound.name != "Not named":
-            sess = self.atlasdb.startSession()
-            res = sess.query(atlasdb.Name)\
-                    .filter(atlasdb.Name.name == compound.name)\
-                    .first()
-            sess.close()
+            res = atlas_api.search_name(compound.name)
         return bool(res)
 
     def npaid_changed(self, compound):
         """
-        Query NP Atlas DB to see if a compound has changed in 
+        Query NP Atlas DB to see if a compound has changed in
         structure
         Return boolean
         """
-        sess = self.atlasdb.startSession()
-        res = sess.query(atlasdb.Compound)\
-                .filter_by(id=compound.npaid)\
-                .first()
-        sess.close()
-        match = compound.inchikey != res.inchikey if res else True
-        return match
+        changed = True
+        if compound.npaid:
+            res = atlas_api.get_compound(compound.npaid)
+            changed = compound.inchikey != res.get("inchikey")
+        return changed
 
+    # TODO: Replace this logic
     def npa_artid_from_article_doi(self, article):
         """
         Query NP Atlas DB and see if an article already exists
@@ -466,12 +493,15 @@ class Checker(object):
         Return npa_artid value or None
         """
         sess = self.atlasdb.startSession()
-        res = sess.query(atlasdb.Reference)\
-                .filter(atlasdb.Reference.doi == article.doi)\
-                .first()
+        res = (
+            sess.query(atlasdb.Reference)
+            .filter(atlasdb.Reference.doi == article.doi)
+            .first()
+        )
         sess.close()
         return res.id if res else None
 
+    # TODO: Replace this logic
     def npa_artid_from_article_title(self, article):
         """
         Query NP Atlas DB and see if an article already exists
@@ -479,9 +509,11 @@ class Checker(object):
         Return npa_artid value or None
         """
         sess = self.atlasdb.startSession()
-        res = sess.query(atlasdb.Reference)\
-                .filter(atlasdb.Reference.title == article.title)\
-                .first()
+        res = (
+            sess.query(atlasdb.Reference)
+            .filter(atlasdb.Reference.title == article.title)
+            .first()
+        )
         sess.close()
         return res.id if res else None
 
@@ -503,18 +535,28 @@ class Correction(object):
     @staticmethod
     def verify_problem(problem):
         assert (
-            problem == "doi" or problem == "pmid" or problem == "journal"
-            or problem == "year" or problem == "volume" or problem == "issue"
-            or problem == "authors" or problem == "title" or problem == "pages"
-            or problem == "abstract" or problem == "duplicate" 
-            or problem == "flat_match" or problem == "genus"
-            or problem == "name_match" or problem == "internal_duplicate"
+            problem == "doi"
+            or problem == "pmid"
+            or problem == "journal"
+            or problem == "year"
+            or problem == "volume"
+            or problem == "issue"
+            or problem == "authors"
+            or problem == "title"
+            or problem == "pages"
+            or problem == "abstract"
+            or problem == "duplicate"
+            or problem == "flat_match"
+            or problem == "genus"
+            or problem == "name_match"
+            or problem == "internal_duplicate"
         )
 
 
 # =============================================================================
 # ==========                Helper functions                      =============
 # =============================================================================
+
 
 def db_add_commit(db_object):
     db.session.add(db_object)
@@ -557,6 +599,7 @@ def find_id_string(regexp_string, input_string):
     else:
         return None
 
+
 def get_id_int(id_string):
     """
     Take an ID string like BGC000001 and return integer value
@@ -578,8 +621,8 @@ def clean_num_pages(page_list):
     """
     if len(page_list) == 2:
         if len(page_list[1]) < len(page_list[0]):
-            plen = len(page_list[0])-len(page_list[1])
-            page_list[1] = page_list[0][0:plen]+page_list[1]
+            plen = len(page_list[0]) - len(page_list[1])
+            page_list[1] = page_list[0][0:plen] + page_list[1]
     return page_list
 
 
@@ -588,7 +631,7 @@ def has_numbers(input_string):
 
 
 def split_source_organism(org_string):
-    data = [x for x in org_string.split(' ') if x]
+    data = [x for x in org_string.split(" ") if x]
     # Check data makes sense
     if len(data) > 1:
         if data[0] in ["Unknown", "unknown"]:
@@ -597,7 +640,7 @@ def split_source_organism(org_string):
             genus_index = 1
         genus = "-".join(data[:genus_index])
         try:
-            species = ' '.join(data[genus_index:])
+            species = " ".join(data[genus_index:])
         except IndexError:
             species = "sp."
         if not species:
@@ -608,7 +651,10 @@ def split_source_organism(org_string):
         species = "sp."
     return genus, species
 
+
 def clean_species(species_string):
     species_string = decapitalize_first(species_string)
     # species_string = re.sub("^(?!sp.)sp$", "sp.", species_string)
-    return re.sub(r'\b(sp|sps|sps\.|spp\.|spp)(?!\S)', "sp.", species_string, re.IGNORECASE)
+    return re.sub(
+        r"\b(sp|sps|sps\.|spp\.|spp)(?!\S)", "sp.", species_string, re.IGNORECASE
+    )
