@@ -8,8 +8,8 @@ class SimpleValidator(object):
         self.message = None
 
     def __call__(self, form, field):
-        type_ = form['type_'].data
-        self.message = u'{}: {} -- Format incorrect'.format(type_, field.data)
+        type_ = form["type_"].data
+        self.message = u"{}: {} -- Format incorrect".format(type_, field.data)
         if type_ == "year":
             try:
                 year = int(field.data)
@@ -24,10 +24,10 @@ class SimpleValidator(object):
                 raise ValidationError(self.message)
         elif type_ == "doi":
             doi = field.data
-            regexp = re.compile(r'^10.\d{4,9}')
+            regexp = re.compile(r"^10.\d{4,9}")
             if not doi:
                 pass
-            elif not regexp.match(doi) or re.search(r'\s\n\t', doi):
+            elif not regexp.match(doi) or re.search(r"\s\n\t", doi):
                 raise ValidationError(self.message)
         elif type_ in ["volume", "issue"]:
             if not field.data:
@@ -46,21 +46,29 @@ class SimpleValidator(object):
             raise ValidationError(type_)
 
 
-class TypeSelectValidator(object):
+class RankSelectValidator(object):
     def __init__(self):
-        self.message = "Select a valid organism type."
+        self.message = "Select a valid organism taxon rank."
 
     def __call__(self, form, field):
-        if not form['genus_type'].data:
+        if not form["taxon_rank"].data:
+            raise ValidationError(self.message)
+
+
+class DBSelectValidator(object):
+    def __init__(self):
+        self.message = "Select a valid organism taxon DB."
+
+    def __call__(self, form, field):
+        if not form["new_taxon_external_db"].data:
             raise ValidationError(self.message)
 
 
 class NpaIdValidator(object):
-
     def __init__(self):
         self.message = "Please enter an NPAID"
 
     def __call__(self, form, field):
-        other = form['select']
+        other = form["select"]
         if other.data == "replace" and not field.data:
             raise ValidationError(self.message)

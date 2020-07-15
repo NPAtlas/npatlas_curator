@@ -1,12 +1,24 @@
 # NP Atlas Curator (v3) WEB APP EDITION
 
+## Changes
+
+- Docker compose deployment
+- Nginx -> Traefik reverse proxy
+- Added Flower monitoring for Background tasks
+- Migrate Checker/Inserter to NP Atlas API
+
+### Deployment
+
+REQUIRED: `export DOMAIN=localhost` or the appropriate servername.
+
+Configure `docker-compose.yml` and `flask.env` as required then simply run `docker-compose up -d`.
 
 ### Note
 
-*Requires an Anaconda or Miniconda Python distribution in order to
-install RDKit.*
+_Requires an Anaconda or Miniconda Python distribution in order to
+install RDKit._
 
-### Docker Deployment
+### DEPRECATED INSTRUCTIONS: Docker Deployment
 
 The app has been configured to run using Docker with three containers:
 
@@ -23,7 +35,7 @@ Various sources have recommended not deploying in this manner.
 
 For simplicity, I suggest `docker build` and `docker run`
 
-1) *Data volume*
+1. _Data volume_
 
 This is a non-running volume which store the data persistently.
 Be careful with this and make backups. This can later be mounted to save data.
@@ -32,12 +44,11 @@ Be careful with this and make backups. This can later be mounted to save data.
 docker volume create mysql-data
 ```
 
-
 ```
 docker exec mysql bash -c 'mysqldump -uroot -p$MYSQL_ROOT_PASSWORD --all-databases > /var/dumps/all.sql'
 ```
 
-2) *MySQL Container*
+2. _MySQL Container_
 
 ```
 docker run --name mysql -p 3306:3306 -v mysql-data:/var/lib/mysql \
@@ -47,7 +58,7 @@ docker run --name mysql -p 3306:3306 -v mysql-data:/var/lib/mysql \
 --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
 ```
 
-3) *Redis Container*
+3. _Redis Container_
 
 The "Checker" portion of the curator app requires a Redis messaging queue
 in order to run the Celery tasks. This server can be started by running:
@@ -64,7 +75,7 @@ From redis-cli:
 config set stop-writes-on-bgsave-error no
 ```
 
-4) *Flask/uWSGI Container*
+4. _Flask/uWSGI Container_
 
 This container will run the Curator Flask app with a uWSGI server.
 You can set the `DBSERVER` environment variable, or else it will default
@@ -77,7 +88,7 @@ Make sure to have a matching `instance/config.py` with the appropriate
 
 If you want to pass as dump file to MySQL, I suggest copying it to the main
 directory of this project. Docker with then copy it and allow you to use
-`flask db upgrade` followed by reading the appropriate  `dump.sql`.
+`flask db upgrade` followed by reading the appropriate `dump.sql`.
 
 ```
 docker exec -it curator bash
@@ -90,10 +101,10 @@ docker build -t curator:latest -t curator:<VERSION> .
 docker run --name curator -v $(pwd):/curator --restart always \
 --link mysql:dbserver --link redis:redis \
 --log-opt max-size=5m --log-opt max-file=10 \
--e DBSERVER=dbserver -e REDIS=redis -d curator:latest 
+-e DBSERVER=dbserver -e REDIS=redis -d curator:latest
 ```
 
-5) *Nginx Container*
+5. _Nginx Container_
 
 I have created a simple custom Dockerfile to simplify deployment.
 You can set the `SERVER_NAME` environment variable during build time,
@@ -108,7 +119,7 @@ docker run --name nginx -v /etc/letsencrypt:/etc/letsencrypt \
 --link curator -d -p 80:80 -p 443:443 my-nginx:latest
 ```
 
-6) *Celery Container*
+6. _Celery Container_
 
 ```
 docker build -f Dockerfile.celery -t curator-celery:latest .

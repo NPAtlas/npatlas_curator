@@ -1,7 +1,9 @@
 import re
 import time
+
 import requests
 from rdkit import Chem
+
 
 """
 PubChem Smiles Standardization:
@@ -32,13 +34,16 @@ ConnectionError - If requests library is unable to reach PubChem
 (Note the last two can be considered as redundant)
 """
 
+
 def get_standardized_smiles(in_smiles, max_retry=3):
     print("Input SMILES:\t%s" % in_smiles)
     # Check that smiles is smile string like
     if not is_smiles(in_smiles):
         raise TypeError
 
-    request1 = requests.post(url=urlSend, data=pubchem_smile_standarize_string.format(in_smiles))
+    request1 = requests.post(
+        url=urlSend, data=pubchem_smile_standarize_string.format(in_smiles)
+    )
     if request1.status_code == requests.codes.ok:
         reqid = get_PCT_reqid(request1.text)
         smiles = None
@@ -64,16 +69,16 @@ def get_standardized_smiles(in_smiles, max_retry=3):
             time.sleep(1)
             counter += 1
         if not smiles:
-          smiles = in_smiles
+            smiles = in_smiles
         print("Output SMILES:\t%s" % smiles)
         return smiles
     else:
         print("There was a failure contacting PUG gateway.")
         raise ValueError
 
- # DO NOT TOUCH BELOW THIIS
-pubchem_smile_standarize_string = \
-"""<?xml version="1.0"?>
+
+# DO NOT TOUCH BELOW THIIS
+pubchem_smile_standarize_string = """<?xml version="1.0"?>
 <!DOCTYPE PCT-Data PUBLIC "-//NCBI//NCBI PCTools/EN" "http://pubchem.ncbi.nlm.nih.gov/pug/pug.dtd">
 <PCT-Data>
   <PCT-Data_input>
@@ -99,8 +104,7 @@ pubchem_smile_standarize_string = \
   </PCT-Data_input>
 </PCT-Data>"""
 
-pubchem_poll_string = \
-"""<?xml version="1.0"?>
+pubchem_poll_string = """<?xml version="1.0"?>
 <!DOCTYPE PCT-Data PUBLIC "-//NCBI//NCBI PCTools/EN" "http://pubchem.ncbi.nlm.nih.gov/pug/pug.dtd">
 <PCT-Data>
   <PCT-Data_input>
@@ -117,16 +121,18 @@ pubchem_poll_string = \
 
 urlSend = "https://pubchem.ncbi.nlm.nih.gov/pug/pug.cgi"
 
+
 def get_PCT_reqid(request_text):
     reqid = None
-    for l in request_text.split('\n'):
+    for l in request_text.split("\n"):
         if "<PCT-Waiting_reqid>" in l:
             reqid = re.sub("</?PCT-Waiting_reqid>", "", l).strip()
             break
     return reqid
 
+
 def check_PCT_status(request_text):
-    for l in request_text.split('\n'):
+    for l in request_text.split("\n"):
         if "<PCT-Status value=" in l:
             try:
                 code = re.search('<PCT-Status value="([a-z]{4,})"/>', l).group(1)
@@ -135,16 +141,23 @@ def check_PCT_status(request_text):
             break
     return True if code == "success" else False
 
+
 def get_PCT_smiles(request_text):
     smiles = None
-    for l in request_text.split('\n'):
+    for l in request_text.split("\n"):
         if "<PCT-Structure_structure_string>" in l:
-            smiles = re.sub("</?PCT-Structure_structure_string>", "", l).strip().replace("&#xa;", "")
+            smiles = (
+                re.sub("</?PCT-Structure_structure_string>", "", l)
+                .strip()
+                .replace("&#xa;", "")
+            )
             break
     return smiles
 
+
 def poll_PCT(request_id):
     return requests.post(url=urlSend, data=pubchem_poll_string.format(request_id))
+
 
 def is_smiles(smiles):
     return bool(Chem.MolFromSmiles(smiles)) and bool(smiles)

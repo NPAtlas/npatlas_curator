@@ -6,16 +6,18 @@ import logging
 from rdkit import Chem
 from rdkit.Chem import rdMolDescriptors, rdDepictor, Descriptors, SaltRemover
 from rdkit.Chem.AllChem import ReplaceSubstructs
+
 # Silence RDKit Warning
 from rdkit import rdBase
-rdBase.DisableLog('rdApp.warning')
+
+rdBase.DisableLog("rdApp.warning")
 from requests.exceptions import RequestException
 
 from .timeout import exit_after
 from .pubchem_smiles_standardizer import get_standardized_smiles
 
-class Compound(object):
 
+class Compound(object):
     def __init__(self, smiles, **kwargs):
         """Initialize Compound object
 
@@ -51,12 +53,10 @@ class Compound(object):
 
         self.calcMolprops()
 
-
     def __repr__(self):
         """repr for debugging
         """
-        return "<Compound(name='%s', formula='%s')>" % (
-            self.name, self.formula)
+        return "<Compound(name='%s', formula='%s')>" % (self.name, self.formula)
 
     def copy(self):
         return copy.deepcopy(self)
@@ -70,13 +70,13 @@ class Compound(object):
         appropriate SMILES string
         """
         self.inchi = Chem.MolToInchi(self.rdmol)
-        self.inchikey = Chem.MolToInchiKey(self.rdmol)
+        self.inchikey = Chem.InchiToInchiKey(self.inchi)
         self.accurate_mass = round(Descriptors.ExactMolWt(self.rdmol), 4)
         self.mass = round(Descriptors.MolWt(self.rdmol), 4)
-        self.m_plus_h = round(self.accurate_mass + calculate_exact_mass('[H+]'), 4)
-        self.m_plus_na = round(self.accurate_mass + calculate_exact_mass('[Na+]'), 4)
+        self.m_plus_h = round(self.accurate_mass + calculate_exact_mass("[H+]"), 4)
+        self.m_plus_na = round(self.accurate_mass + calculate_exact_mass("[Na+]"), 4)
         # Set name in molblock
-        self.rdmol.SetProp('_Name', self.name)
+        self.rdmol.SetProp("_Name", self.name)
         rdDepictor.Compute2DCoords(self.rdmol)
         self.molblock = Chem.MolToMolBlock(self.rdmol)
         self.formula = rdMolDescriptors.CalcMolFormula(self.rdmol)
@@ -91,7 +91,7 @@ class Compound(object):
         neutralized = self._neutralizeMol()
         defragmented = self._getLargestFragment()
         if neutralized or defragmented:
-            logging.warning('WARNING: Compound structure changed')
+            logging.warning("WARNING: Compound structure changed")
             self._standardizeSmiles()
             self.calcMolprops()
 
@@ -101,16 +101,15 @@ class Compound(object):
         _remover = SaltRemover.SaltRemover()
         molnosalt, deleted = _remover.StripMolWithDeleted(self.rdmol)
         if deleted:
-            logging.info('Found salt in molecule: %s\t%s'
-                     % (self.name, self.inchikey))
+            logging.info("Found salt in molecule: %s\t%s" % (self.name, self.inchikey))
             neutralized_mol, neutralized = _neutraliseCharges(
-                Chem.MolToSmiles(molnosalt))
+                Chem.MolToSmiles(molnosalt)
+            )
         else:
-            neutralized_mol, neutralized = _neutraliseCharges(
-                self.smiles)
+            neutralized_mol, neutralized = _neutraliseCharges(self.smiles)
         neutral_mol = Chem.MolFromSmiles(neutralized_mol)
         if neutralized:
-            logging.debug('Molecule was neutralized')
+            logging.debug("Molecule was neutralized")
             self.rdmol = neutral_mol
             self.smiles = neutralized_mol
         return neutralized
@@ -121,8 +120,10 @@ class Compound(object):
         fragments = Chem.GetMolFrags(self.rdmol, asMols=True)
         if len(fragments) > 1:
             is_fragments = True
-            logging.info('Found multiple fragments in molecule: %s\t%s'
-                     % (self.name, self.inchikey))
+            logging.info(
+                "Found multiple fragments in molecule: %s\t%s"
+                % (self.name, self.inchikey)
+            )
             for frag in fragments:
                 longest = 0
                 n_atoms = frag.GetNumAtoms()
@@ -140,8 +141,7 @@ class Compound(object):
             smiles = self.smiles
         try:
             self.smiles = standardize_smiles_wrapper(smiles)
-        except (KeyboardInterrupt, TypeError, ValueError,
-                RequestException) as e:
+        except (KeyboardInterrupt, TypeError, ValueError, RequestException) as e:
             logging.error("Unable to standardize %s", smiles)
             logging.error(e)
             self.smiles = smiles
@@ -153,26 +153,25 @@ class Compound(object):
 def _InitialiseNeutralisationReactions():
     patts = (
         # Imidazoles
-        ('[n+;H]', 'n'),
+        ("[n+;H]", "n"),
         # Amines
-        ('[N+;!H0]', 'N'),
+        ("[N+;!H0]", "N"),
         # Carboxylic acids and alcohols
-        ('[$([O-]);!$([O-][#7])]', 'O'),
+        ("[$([O-]);!$([O-][#7])]", "O"),
         # Thiols
-        ('[S-;X1]', 'S'),
+        ("[S-;X1]", "S"),
         # Sulfonamides
-        ('[$([N-;X2]S(=O)=O)]', 'N'),
+        ("[$([N-;X2]S(=O)=O)]", "N"),
         # Enamines
-        ('[$([N-;X2][C,N]=C)]', 'N'),
+        ("[$([N-;X2][C,N]=C)]", "N"),
         # Tetrazoles
-        ('[n-]', '[nH]'),
+        ("[n-]", "[nH]"),
         # Sulfoxides
-        ('[$([S-]=O)]', 'S'),
+        ("[$([S-]=O)]", "S"),
         # Amides
-        ('[$([N-]C=O)]', 'N'),
+        ("[$([N-]C=O)]", "N"),
     )
-    return [(Chem.MolFromSmarts(x),
-             Chem.MolFromSmiles(y, False)) for x, y in patts]
+    return [(Chem.MolFromSmarts(x), Chem.MolFromSmiles(y, False)) for x, y in patts]
 
 
 _reactions = None
@@ -201,10 +200,12 @@ def calculate_exact_mass(smiles):
     m = Chem.MolFromSmiles(smiles)
     return Descriptors.ExactMolWt(m)
 
+
 @exit_after(5)
 def standardize_smiles_wrapper(smiles):
     return get_standardized_smiles(smiles)
 
+
 def inchikey_from_smiles(smiles):
     m = Chem.MolFromSmiles(smiles)
-    return Chem.MolToInchiKey(m)
+    return Chem.InchiToInchiKey(Chem.MolToInchi(m))

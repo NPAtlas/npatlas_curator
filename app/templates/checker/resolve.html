@@ -28,6 +28,14 @@
         <a href=" {{ url_for('checker.problem_list', ds_id=ds_id) }}">
             Return to List
         </a>
+        <div class="row" style="justify-content: center">
+            <a class="btn btn-primary" href="{{prev_problem_url if prev_problem_url else '#' }}">
+                Previous
+            </a>
+            <a class="btn btn-primary" href="{{next_problem_url if next_problem_url else '#' }}">
+                Next
+            </a>
+        </div>
         <hr class="full-divider">
     </div>
     <div class="container" class="info-section">
@@ -154,8 +162,9 @@
 
         {% elif problem.problem == "genus" %}
             <h4>
-                Value: {{ compound.genus }}
+                Value: {{ compound.source_genus }}
             </h4>
+            <span style='color: red;'>Please re-run the checker after making Taxonomy Resolutions.</span>
             <form method="POST" class="form-horizontal">
                 {{ form.value() }}
                 <div class="row form-group">
@@ -163,16 +172,37 @@
                     {{ form.select(class="form-control") }}
                 </div>
                 <div class="row form-group">
-                    {{ form.genus_type.label(class_="control-label") }}
-                    {{ form.genus_type(class_="form-control") }}
+                    {{ form.taxon_rank.label(class_="control-label") }}
+                    {{ form.taxon_rank(class_="form-control") }}
                 </div>
-                <div class="row form-group">
-                    {{ form.new_genus_name.label(class_="control-label newGenus") }}
-                    {{ form.new_genus_name(class_="newGenus form-control") }}
+                <div class="row form-group newTaxon">
+                    {{ form.new_taxon_name.label(class_="control-label") }}
+                    {{ form.new_taxon_name(class_="form-control") }}
                 </div>
-                <div class="row form-group">
-                    {{ form.alt_genus_name.label(class_="control-label altGenus") }}
-                    {{ form.alt_genus_name(class_="altGenus form-control") }}
+                <div class="newTaxon">
+                    <p style='color: red;'>Please use NP Atlas API to determine parent Taxon ID</p>
+                    <p><a href="http://npatlas-dev.chem.sfu.ca/api/v1" target="_blank">NP Atlas Dev API</a></p>
+                </div>
+                <div class="row form-group newTaxon">
+                    {{ form.new_taxon_parent_id.label(class_="control-label") }}
+                    {{ form.new_taxon_parent_id(class_="form-control") }}
+                </div>
+                <div class="newTaxon">
+                    <p style='color: red;'>Please use External DB to find external ID</p>
+                    <p><a href="https://lpsn.dsmz.de/" target="_blank">LPSN</a></p>
+                    <p><a href="http://www.mycobank.org/" target="_blank">Mycobank</a></p>
+                </div>
+                <div class="row form-group newTaxon">
+                    {{ form.new_taxon_external_db.label(class_="control-label") }}
+                    {{ form.new_taxon_external_db(class_="form-control") }}
+                </div>
+                <div class="row form-group newTaxon">
+                    {{ form.new_taxon_external_id.label(class_="control-label") }}
+                    {{ form.new_taxon_external_id(class_="form-control") }}
+                </div>
+                <div class="row form-group altGenus">
+                    {{ form.alt_taxon_name.label(class_="control-label") }}
+                    {{ form.alt_taxon_name(class_="form-control") }}
                 </div>
                 <div class="row form-group" style="justify-content:center">
                     {{ form.hidden_tag() }} {{ form.submit(class_='btn btn-success', type='submit') }}
@@ -181,6 +211,10 @@
                     {{ form.reject(class_='btn btn-danger', type='submit') }}
                 </div>
             </form>
+
+        {% elif problem.problem == "multiple_taxa" %}
+            <h4>Value: {{compound.source_genus}}</h4>
+            <h1>TBD...</h1>
         {% elif problem.problem == "flat_match" or problem.problem == "duplicate" or problem.problem == "name_match" %}
             <h4>
                 Candidate
@@ -256,6 +290,16 @@
         <div class="row" style="justify-content: center">
             <a class="btn btn-info" href=" {{url_for('data.article', cur_id=cur_id, ds_id=ds_id, art_id=article.id)}} ">
                 Edit Article?
+            </a>
+        </div>
+        <br>
+        <br>
+        <div class="row" style="justify-content: center">
+            <a class="btn btn-primary" href="{{prev_problem_url if prev_problem_url else '#' }}">
+                Previous
+            </a>
+            <a class="btn btn-primary" href="{{next_problem_url if next_problem_url else '#' }}">
+                Next
             </a>
         </div>
     </div>

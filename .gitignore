@@ -6,9 +6,11 @@ __pycache__
 .pytest_cache
 .coverage
 htmlcov/
-dump.sql
-mysql-dumps/*
+mysql-dumps/
 dh-params/
+.pytest_cache/
+.mypy_cache/
+data/
 
 # For playground purposes
 curator_env/

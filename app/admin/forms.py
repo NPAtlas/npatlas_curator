@@ -9,13 +9,16 @@ class CuratorForm(FlaskForm):
     """
     For admin to add or edit curator
     """
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    username = StringField('Username', validators=[DataRequired()])
-    first_name = StringField('First name')
-    last_name = StringField('Last name')
-    password = StringField('Password', validators=[DataRequired(), EqualTo('confirm_password')])
-    confirm_password = StringField('Confirm Password')
-    submit = SubmitField('Submit Curator')
+
+    email = StringField("Email", validators=[DataRequired(), Email()])
+    username = StringField("Username", validators=[DataRequired()])
+    first_name = StringField("First name")
+    last_name = StringField("Last name")
+    password = StringField(
+        "Password", validators=[DataRequired(), EqualTo("confirm_password")]
+    )
+    confirm_password = StringField("Confirm Password")
+    submit = SubmitField("Submit Curator")
 
     # def validate_email(self, field):
     #     if Curator.query.filter_by(email=field.data).first():
@@ -30,6 +33,7 @@ class DatasetForm(FlaskForm):
     """
     For admin to edit / assign datasets
     """
-    instructions = StringField('Instructions')
+
+    instructions = StringField("Instructions")
     curator_id = SelectField("Curator", coerce=int, validate_choice=False)
-    submit = SubmitField('Submit Dataset')
+    submit = SubmitField("Submit Dataset")

@@ -1,42 +1,85 @@
-version: '3'
-
-volumes:
-  curator_data:
+version: "3"
 
 services:
-  mysql:
-    image: mysql/mysql-server:5.7
-    container_name: mysql_container
-    ports: 
-      - 3306:3306
-    environment: 
-      MYSQL_DATABASE: npatlas_curation
-      MYSQL_USER: jvansan
-      MYSQL_PASSWORD: password
-    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
-    volumes:
-      - curator_data:/var/lib/mysql
+  # traefik:
+  #   image: traefik:2.1
+  #   # Enables the web UI and tells Traefik to listen to docker
+  #   # Enables self-signed certificates for development
+  #   command: >
+  #     --providers.docker
+  #     --api.dashboard=true
+  #     --api.insecure=true
+  #     --accesslog
+  #     --log.level=DEBUG
+  #     --entrypoints.web.address=:80
+  #   ports:
+  #     # The HTTP(S) port
+  #     - "80:80"
+  #     # The traefik port
+  #     - "8888:8080"
+  #   volumes:
+  #     # So that Traefik can listen to the Docker events
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ./dev-certs:/cert
+  #     - ./config:/config
+  #   logging:
+  #     driver: "json-file"
+  #     options:
+  #       max-size: "200k"
+  #       max-file: "10"
+
   curator:
-    image: curator
-    container_name: curator_container
     build:
       context: .
-      dockerfile: Dockerfile
-    ports:
-      - 3031:3031
-    links: 
-      - mysql:dbserver
-    environment: 
-      DBHOST: dbserver
-  nginx:
-    image: my-nginx
-    container_name: nginx_container
-    ports:
-      - 80:80
-    links:
-      - curator
+      dockerfile: ./Docker/Dockerfile.dev
+    image: atlas-curator:v3.1.dev
+    restart: always
+    env_file:
+      - ./flask.env
+    # Dev deploy with link to code for hot-changes
+    volumes:
+      - ./app:/curator/app/
+    labels:
+      - "traefik.http.routers.curator.entrypoints=web"
+      - "traefik.http.routers.curator.rule=Host(`${DOMAIN?Variable not set}`)"
+      - "traefik.http.middlewares.curator-gzip.compress=true"
+      - "traefik.http.routers.curator.middlewares=curator-gzip@docker"
+
+  celery:
     build:
-      context: ./my-nginx
-      dockerfile: Dockerfile
-      # args:
-      #   SERVER_NAME: npatlas-curate.chem.sfu.ca
+      context: .
+      dockerfile: ./Docker/Dockerfile.celery
+    image: atlas-curator-celery:v3.1.dev
+    restart: always
+    env_file:
+      - ./flask.env
+    # Dev deploy with link to code for hot-changes
+    volumes:
+      - ./app:/curator/app/
+
+  # Celery task monitoring
+  monitor:
+    image: mher/flower
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - FLOWER_PORT=5555
+      - FLOWER_URL_PREFIX=/celery
+    labels:
+      - "traefik.http.routers.monitor.entrypoints=web"
+      - "traefik.http.routers.monitor.rule=PathPrefix(`/celery`)"
+      - "traefik.http.middlewares.monitor-strip.stripprefix.prefixes=/celery"
+      - "traefik.http.middlewares.monitor-strip.stripprefix.forceslash=true"
+      - "traefik.http.middlewares.monitor-auth.basicauth.users=admin:<REPLACE_ME>"
+      - "traefik.http.routers.monitor.middlewares=monitor-strip@docker,monitor-auth@docker"
+
+  redis:
+    image: redis
+    restart: always
+    volumes:
+      - "./data/docker/redis:/data"
+    command: ["redis-server", "--appendonly", "yes"]
+
+networks:
+  default:
+    external:
+      name: atlas_network
