@@ -5,25 +5,33 @@ from flask_bootstrap import Bootstrap
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_caching import Cache
 from celery import Celery
 
 # local imports
 from config import app_config
-REDISSERVER = os.environ.get("REDIS", '127.0.0.1')
-app_config['CELERY_BROKER_URL'] = 'redis://{}:6379'.format(REDISSERVER)
-app_config['CELERY_RESULT_BACKEND'] = 'redis://{}:6379'.format(REDISSERVER)
+
+REDISSERVER = os.environ.get("REDIS", "127.0.0.1")
+app_config["CELERY_BROKER_URL"] = "redis://{}:6379".format(REDISSERVER)
+app_config["CELERY_RESULT_BACKEND"] = "redis://{}:6379".format(REDISSERVER)
 
 # initialze app variables
 bootstrap = Bootstrap()
-celery = Celery(__name__, broker=app_config['CELERY_BROKER_URL'], backend=app_config['CELERY_RESULT_BACKEND'])
+celery = Celery(
+    __name__,
+    broker=app_config["CELERY_BROKER_URL"],
+    backend=app_config["CELERY_RESULT_BACKEND"],
+)
 db = SQLAlchemy()
 login_manager = LoginManager()
+cache = Cache(config={"CACHE_TYPE": "simple"})
+
 
 def create_app(config_name="default"):
     # Create app and set config
-    app = Flask(__name__, instance_relative_config=True)
+    app = Flask(__name__)
     app.config.from_object(app_config[config_name])
-    app.config.from_pyfile('config.py')
+    app.config.from_pyfile("config.py")
 
     # initialze db, bootstrap, celery and login manager
     bootstrap.init_app(app)
@@ -33,18 +41,24 @@ def create_app(config_name="default"):
     login_manager.login_view = "auth.login"
     migrate = Migrate(app, db)
     celery.conf.update(app.config)
+    cache.init_app(app)
 
     from app import models
 
     from .auth import auth as auth_blueprint
+
     app.register_blueprint(auth_blueprint)
     from .admin import admin as admin_blueprint
-    app.register_blueprint(admin_blueprint, prefix='/admin')
+
+    app.register_blueprint(admin_blueprint, prefix="/admin")
     from .home import home as home_blueprint
+
     app.register_blueprint(home_blueprint)
     from .data import data as data_blueprint
-    app.register_blueprint(data_blueprint, prefix='/data')
+
+    app.register_blueprint(data_blueprint, prefix="/data")
     from .checker import checker as checker_blueprint
+
     app.register_blueprint(checker_blueprint)
 
     @app.before_first_request
@@ -56,14 +70,14 @@ def create_app(config_name="default"):
 
     @app.errorhandler(403)
     def forbidden(error):
-        return render_template('errors/403.html', title="Forbidden"), 403
+        return render_template("errors/403.html", title="Forbidden"), 403
 
     @app.errorhandler(404)
     def page_not_found(error):
-        return render_template('errors/404.html', title="Page Not Found"), 404
+        return render_template("errors/404.html", title="Page Not Found"), 404
 
     @app.errorhandler(500)
     def internal_server_error(error):
-        return render_template('errors/500.html', title="Server Error"), 500
+        return render_template("errors/500.html", title="Server Error"), 500
 
     return app

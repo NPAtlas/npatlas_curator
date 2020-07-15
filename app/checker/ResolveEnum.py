@@ -8,8 +8,9 @@ class ResolveEnum(Enum):
     or to facilitate updating a compounds information
     """
 
-    new = 1
-    replace = 2
-    keep = 3
-    update = 4
-    reject = 5
+    NEW = 1
+    REPLACE = 2
+    KEEP = 3
+    UPDATE = 4
+    REJECT = 5
+    SYNONYM = 6

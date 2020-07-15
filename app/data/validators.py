@@ -4,7 +4,7 @@ from wtforms.validators import ValidationError
 # Custom Validators
 class ValidateYear(object):
     def __init__(self):
-        self.message = u'Year field is not valid. Must be between 1800-3000.'
+        self.message = u"Year field is not valid. Must be between 1800-3000."
 
     def __call__(self, form, field):
         try:
@@ -20,14 +20,15 @@ class ValidateDOI(object):
         self.message = u"""DOI does not appear valid.
                            Must start with r'10.\d{4,9}' pattern
                            and may not contain whitespace"""
-        self.regexp = re.compile(r'^10.\d{4,9}')
+        self.regexp = re.compile(r"^10.\d{4,9}")
 
     def __call__(self, form, field):
         doi = field.data
         if not doi:
             pass
-        elif not self.regexp.match(doi) or re.search(r'\s\n\t', doi):
+        elif not self.regexp.match(doi) or re.search(r"\s\n\t", doi):
             raise ValidationError(self.message)
+
 
 class ValidateNumCompounds(object):
     def __init__(self):
@@ -36,6 +37,6 @@ class ValidateNumCompounds(object):
                            select 'Needs Work' """
 
     def __call__(self, form, field):
-        other = form['compounds']
+        other = form["compounds"]
         if field.data != len(other.data):
             raise ValidationError(self.message)

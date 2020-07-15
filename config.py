@@ -4,7 +4,7 @@ class Config(object):
     """
 
     DEBUG = True
-    SQLALCHEMY_TRACK_MODIFICATIONS = False 
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 
 class DevelopmentConfig(Config):
@@ -13,7 +13,7 @@ class DevelopmentConfig(Config):
     """
 
     # SQLALCHEMY_ECHO = True
-    # LOGIN_DISABLED=True
+    # LOGIN_DISABLED = True
 
 
 class ProductionConfig(Config):
@@ -31,9 +31,10 @@ class TestingConfig(Config):
 
     TESTING = True
 
+
 app_config = {
-    'default': DevelopmentConfig,
-    'development': DevelopmentConfig,
-    'production': ProductionConfig,
-    'testing': TestingConfig
+    "default": DevelopmentConfig,
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+    "testing": TestingConfig,
 }

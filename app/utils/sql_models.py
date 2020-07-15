@@ -4,11 +4,21 @@
 Only provides access to SQL models
 DOES NOT CREATE TABLES
 """
-from sqlalchemy import (Table, func, Column, Integer, Numeric, String,
-                        ForeignKey, Boolean, DateTime, Text, create_engine)
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Numeric,
+    String,
+    Table,
+    Text,
+    create_engine,
+    func,
+)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, relationship, backref
-
+from sqlalchemy.orm import backref, relationship, sessionmaker
 
 Base = declarative_base()
 
@@ -30,21 +40,17 @@ class Curator(Base):
 
 # Define dataset_article and article_compound many-to-many relationships
 dataset_article = Table(
-    'dataset_article',
+    "dataset_article",
     Base.metadata,
-    Column('dataset_id', Integer, ForeignKey('dataset.id'),
-              primary_key=True),
-    Column('article_id', Integer, ForeignKey('article.id'),
-              primary_key=True)
+    Column("dataset_id", Integer, ForeignKey("dataset.id"), primary_key=True),
+    Column("article_id", Integer, ForeignKey("article.id"), primary_key=True),
 )
 
 article_compound = Table(
-    'article_compound',
+    "article_compound",
     Base.metadata,
-    Column('article_id', Integer, ForeignKey('article.id'),
-              primary_key=True),
-    Column('compound_id', Integer, ForeignKey('compound.id'),
-              primary_key=True)
+    Column("article_id", Integer, ForeignKey("article.id"), primary_key=True),
+    Column("compound_id", Integer, ForeignKey("compound.id"), primary_key=True),
 )
 
 
@@ -52,18 +58,23 @@ class Dataset(Base):
     """
     Create dataset table/model
     """
+
     __tablename__ = "dataset"
     id = Column(Integer, primary_key=True)
-    curator_id = Column(Integer, ForeignKey('curator.id'))
-    curator = relationship('Curator', backref='datasets', lazy=True)
+    curator_id = Column(Integer, ForeignKey("curator.id"))
+    curator = relationship("Curator", backref="datasets", lazy=True)
     create_date = Column(DateTime, default=func.current_timestamp())
-    last_edit_date = Column(DateTime, default=func.current_timestamp(),
-                               onupdate=func.current_timestamp())
-    last_article_id = Column(Integer, ForeignKey('article.id'))
+    last_edit_date = Column(
+        DateTime, default=func.current_timestamp(), onupdate=func.current_timestamp()
+    )
+    last_article_id = Column(Integer, ForeignKey("article.id"))
     instructions = Column(String(1000))
     completed = Column(Boolean, default=False)
-    articles = relationship('Article', secondary=dataset_article,
-                               backref=backref('datasets', lazy=True, cascade="all"))
+    articles = relationship(
+        "Article",
+        secondary=dataset_article,
+        backref=backref("datasets", lazy=True, cascade="all"),
+    )
     training = Column(Integer, default=0)
 
 
@@ -71,6 +82,7 @@ class Article(Base):
     """
     Create article table/model
     """
+
     __tablename__ = "article"
     id = Column(Integer, primary_key=True)
     pmid = Column(Integer)
@@ -84,8 +96,11 @@ class Article(Base):
     title = Column(Text)
     abstract = Column(Text)
     num_compounds = Column(Integer)
-    compounds = relationship('Compound', secondary=article_compound,
-                                backref=backref('article', cascade="all"))
+    compounds = relationship(
+        "Compound",
+        secondary=article_compound,
+        backref=backref("article", cascade="all"),
+    )
     # Tracking column
     completed = Column(Boolean, default=False)
     notes = Column(Text)
@@ -98,12 +113,14 @@ class Compound(Base):
     """
     Create compound table/model
     """
+
     __tablename__ = "compound"
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
     smiles = Column(String(1000))
     source_organism = Column(String(255))
     npaid = Column(Integer)
+
 
 # ORM Interface
 class CuratorDB(object):
@@ -131,5 +148,7 @@ class CuratorDB(object):
         SQLAlchemy.orm.Session
             Session for interacting with DB
         """
-        Session = sessionmaker(bind=self.engine, autocommit=autocommit, autoflush=autoflush)
+        Session = sessionmaker(
+            bind=self.engine, autocommit=autocommit, autoflush=autoflush
+        )
         return Session()

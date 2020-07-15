@@ -1,7 +1,6 @@
 from functools import wraps
 
-from flask import (abort, flash, redirect, render_template, request, url_for,
-                   current_app)
+from flask import abort, flash, redirect, render_template, request, url_for, current_app
 from flask_login import current_user, login_required
 
 from . import admin
@@ -17,6 +16,7 @@ def require_admin(func):
     Decorator to prevent non-admins from accessing the page
     When in development environment this is ignored
     """
+
     @wraps(func)
     def decorated_function(*args, **kwargs):
         if not current_app.config.get("LOGIN_DISABLED", False):
@@ -27,7 +27,7 @@ def require_admin(func):
     return decorated_function
 
 
-@admin.route('/admin/datasets')
+@admin.route("/admin/datasets")
 @login_required
 @require_admin
 def list_datasets():
@@ -35,40 +35,62 @@ def list_datasets():
     List all datasets and give checker access
     """
     # Get page
-    page = request.args.get('page', 1, type=int)
+    page = request.args.get("page", 1, type=int)
 
     datasets = Dataset.query.order_by(Dataset.id.desc()).paginate(page, 10, False)
 
-    next_url = url_for("admin.list_datasets", page=datasets.next_num)\
-        if datasets.has_next else None
-    prev_url = url_for("admin.list_datasets", page=datasets.prev_num)\
-        if datasets.has_prev else None
+    next_url = (
+        url_for("admin.list_datasets", page=datasets.next_num)
+        if datasets.has_next
+        else None
+    )
+    prev_url = (
+        url_for("admin.list_datasets", page=datasets.prev_num)
+        if datasets.has_prev
+        else None
+    )
 
-    return render_template('admin/datasets.html', datasets=datasets, title='Add Datasets',
-                           next_url=next_url, prev_url=prev_url)
+    return render_template(
+        "admin/datasets.html",
+        datasets=datasets,
+        title="Add Datasets",
+        next_url=next_url,
+        prev_url=prev_url,
+    )
 
 
-@admin.route('/admin/articles')
+@admin.route("/admin/articles")
 @login_required
 @require_admin
 def list_articles():
     """
     List all articles
     """
-    page = request.args.get('page', 1, type=int)
+    page = request.args.get("page", 1, type=int)
     articles = Article.query.paginate(page, 10, False)
 
-    next_url = url_for("admin.list_articles", page=articles.next_num)\
-        if articles.has_next else None
-    prev_url = url_for("admin.list_articles", page=articles.prev_num)\
-        if articles.has_prev else None
+    next_url = (
+        url_for("admin.list_articles", page=articles.next_num)
+        if articles.has_next
+        else None
+    )
+    prev_url = (
+        url_for("admin.list_articles", page=articles.prev_num)
+        if articles.has_prev
+        else None
+    )
 
-    return render_template('admin/articles/articles.html', articles=articles, title='All Articles',
-                            article_redirect=lambda x: url_for('admin.article', id=x),
-                            next_url=next_url, prev_url=prev_url)
+    return render_template(
+        "admin/articles/articles.html",
+        articles=articles,
+        title="All Articles",
+        article_redirect=lambda x: url_for("admin.article", id=x),
+        next_url=next_url,
+        prev_url=prev_url,
+    )
 
 
-@admin.route('/admin/articles/article<int:id>', methods=['GET', 'POST'])
+@admin.route("/admin/articles/article<int:id>", methods=["GET", "POST"])
 @login_required
 @require_admin
 def article(id):
@@ -108,17 +130,17 @@ def article(id):
 
         try:
             db.session.commit()
-            flash('Data saved!')
+            flash("Data saved!")
         except:
             db.session.rollback()
-            flash('Error sending data to database...')
+            flash("Error sending data to database...")
 
-        return redirect(url_for('admin.list_articles'))
+        return redirect(url_for("admin.list_articles"))
 
-    return render_template('data/article.html', title='Article', form=form)
+    return render_template("data/article.html", title="Article", form=form)
 
 
-@admin.route('/admin/curators')
+@admin.route("/admin/curators")
 @login_required
 @require_admin
 def list_curators():
@@ -127,12 +149,15 @@ def list_curators():
     """
     curators = Curator.query.all()
 
-    return render_template('admin/curators/curators.html', curators=curators, title='Curators',
-                            data_redirect=lambda x: url_for('data.curator_dashboard', cur_id=x)
-                            )
+    return render_template(
+        "admin/curators/curators.html",
+        curators=curators,
+        title="Curators",
+        data_redirect=lambda x: url_for("data.curator_dashboard", cur_id=x),
+    )
 
 
-@admin.route('/admin/curators/add', methods=['GET', 'POST'])
+@admin.route("/admin/curators/add", methods=["GET", "POST"])
 @login_required
 @require_admin
 def add_curator():
@@ -142,28 +167,37 @@ def add_curator():
     add_curator = True
     form = CuratorForm()
     if form.validate_on_submit():
-        curator = Curator(email=form.email.data,
-                          username=form.username.data,
-                          first_name=form.first_name.data,
-                          last_name=form.last_name.data,
-                          password=form.password.data)
+        curator = Curator(
+            email=form.email.data,
+            username=form.username.data,
+            first_name=form.first_name.data,
+            last_name=form.last_name.data,
+            password=form.password.data,
+        )
         try:
             db.session.add(curator)
             db.session.commit()
-            flash('You have successfully added a new curator.\nNote the password is {}'\
-                    .format(form.password.data))
+            flash(
+                "You have successfully added a new curator.\nNote the password is {}".format(
+                    form.password.data
+                )
+            )
         except:
             db.session.rollback()
-            flash('Error: Curator already exists')
+            flash("Error: Curator already exists")
 
-        return redirect(url_for('admin.list_curators'))
+        return redirect(url_for("admin.list_curators"))
 
-    return render_template('admin/curators/curator.html', action="Add",
-                       add_curator=add_curator, form=form,
-                       title='Add Curator')
+    return render_template(
+        "admin/curators/curator.html",
+        action="Add",
+        add_curator=add_curator,
+        form=form,
+        title="Add Curator",
+    )
 
 
-@admin.route('/admin/curators/edit/<int:id>', methods=['GET', 'POST'])
+@admin.route("/admin/curators/edit/<int:id>", methods=["GET", "POST"])
 @login_required
 @require_admin
 def edit_curator(id):
@@ -182,25 +216,32 @@ def edit_curator(id):
         curator.password = form.password.data
         try:
             db.session.commit()
-            flash('You have successfully added a new curator.\nNote the password is {}'\
-                    .format(form.password.data))
+            flash(
+                "You have successfully added a new curator.\nNote the password is {}".format(
+                    form.password.data
+                )
+            )
         except:
             db.session.rollback()
-            flash('Error: Curator data could not be edited.')
+            flash("Error: Curator data could not be edited.")
 
-        return redirect(url_for('admin.list_curators'))
+        return redirect(url_for("admin.list_curators"))
 
     form.email.data = curator.email
     form.username.data = curator.username
     form.first_name.data = curator.first_name
     form.last_name.data = curator.last_name
 
-    return render_template('admin/curators/curator.html', action="Edit",
-                           add_curator=add_curator, form=form,
-                           title='Edit Curator')
+    return render_template(
+        "admin/curators/curator.html",
+        action="Edit",
+        add_curator=add_curator,
+        form=form,
+        title="Edit Curator",
+    )
 
 
-@admin.route('/admin/datasets/edit/<int:id>', methods=['GET', 'POST'])
+@admin.route("/admin/datasets/edit/<int:id>", methods=["GET", "POST"])
 @login_required
 @require_admin
 def edit_dataset(id):
@@ -208,7 +249,7 @@ def edit_dataset(id):
     Edit a dataset curator or instructions
     """
     dataset = Dataset.query.get_or_404(id)
-    curators = Curator.query.order_by('id').all()
+    curators = Curator.query.order_by("id").all()
     form = DatasetForm(obj=dataset)
 
     if form.validate_on_submit():
@@ -216,14 +257,15 @@ def edit_dataset(id):
         dataset.instructions = form.instructions.data
         try:
             db.session.commit()
-            flash('You have successfully editted the Dataset')
+            flash("You have successfully editted the Dataset")
         except:
             db.session.rollback()
             flash("Error: could not edit Dataset")
 
-        return redirect(url_for('admin.list_datasets'))
+        return redirect(url_for("admin.list_datasets"))
 
     form.curator_id.choices = [(c.id, c.full_name) for c in curators]
     form.instructions.data = dataset.instructions
 
-    return render_template('admin/edit_dataset.html', form=form)
+    return render_template("admin/edit_dataset.html", form=form)
+

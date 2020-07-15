@@ -10,11 +10,10 @@ from .forms import LoginForm
 def is_safe_url(target):
     ref_url = urlparse(request.host_url)
     test_url = urlparse(urljoin(request.host_url, target))
-    return test_url.scheme in ('http', 'https') and \
-           ref_url.netloc == test_url.netloc
+    return test_url.scheme in ("http", "https") and ref_url.netloc == test_url.netloc
 
 
-@auth.route('/login', methods=['GET', 'POST'])
+@auth.route("/login", methods=["GET", "POST"])
 def login():
     """
     Handle requests to "/login"
@@ -29,17 +28,19 @@ def login():
 
             # redirect to appropriate place
             if curator.is_admin:
-                return form.redirect(url_for('home.admin_dashboard'), form=form)
+                return form.redirect(url_for("home.admin_dashboard"), form=form)
             else:
-                return form.redirect(url_for('data.curator_dashboard', cur_id=curator.id))
+                return form.redirect(
+                    url_for("data.curator_dashboard", cur_id=curator.id)
+                )
         else:
-            flash('Invalid username or password.')
+            flash("Invalid username or password.")
 
     # load login template
-    return render_template('auth/login.html', form=form, title="Login")
+    return render_template("auth/login.html", form=form, title="Login")
 
 
-@auth.route('/logout')
+@auth.route("/logout")
 @login_required
 def logout():
     """
@@ -47,7 +48,7 @@ def logout():
     Log a curator out through link
     """
     logout_user()
-    flash('You have successfully been logged out.')
+    flash("You have successfully been logged out.")
 
     # redirect to home page
-    return redirect(url_for('home.homepage'))
+    return redirect(url_for("home.homepage"))

@@ -1,44 +1,25 @@
 import logging
 import re
+from typing import List
 
 from app import db
+from app.checker.NameString import NameString, decapitalize_first
+from app.checker.ResolveEnum import ResolveEnum
 from app.models import (
     CheckerArticle,
     CheckerCompound,
     CheckerDataset,
     Dataset,
-    Genus,
     Journal,
     Problem,
     Retraction,
+    Taxon,
 )
-from app.utils import pubchem_search
-from app.utils.atlasdb import atlasdb
 from app.utils import atlas_api
 from app.utils.Compound import Compound, inchikey_from_smiles
-from app.checker.NameString import NameString, decapitalize_first
-from app.checker.ResolveEnum import ResolveEnum
-
-# This unit contains far too much tight coupling between checker and flask app
 
 
-class Checker(object):
-    # Hacky solution to keeping URI in config file
-    atlasdb = atlasdb
-    try:
-        import sys
-        import warnings
-
-        sys.path.append("../..")
-        from instance.config import ATLAS_DATABASE_URI
-
-        # suppress annoying MariaDB version warning
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            atlasdb.dbInit(ATLAS_DATABASE_URI)
-    except ImportError:
-        raise Exception("Missing ATLAS_DATABASE_URI in config")
-
+class Checker:
     def __init__(self, dataset_id, *args, **kwargs):
         self.dataset_id = dataset_id
 
@@ -47,6 +28,14 @@ class Checker(object):
 
         self.review_list = []
         self.checked_compound_inchikeys = dict()
+        self._journals = []
+
+    @property
+    def atlas_journals(self):
+        """Memoized copy of Journal titles in Atlas"""
+        if not self._journals:
+            self._journals = atlas_api.get_journals()
+        return self._journals
 
     def update_status(self, current, total, status):
         if self.task:
@@ -70,7 +59,7 @@ class Checker(object):
 
             # Skip over articles which are not properly curated
             if not article.completed or article.needs_work or not article.is_nparticle:
-                self.logger.warning("Skipping article {}!".format(article.id))
+                self.logger.warning("Skipping article {}".format(article.id))
                 continue
 
             check_art = self.create_checker_article(article, restart=restart)
@@ -104,11 +93,9 @@ class Checker(object):
         commit()
 
     def save_review_list(self):
-        counter = 0
         Problem.query.filter_by(dataset_id=self.dataset_id).delete()
         commit()
         for corr in self.review_list:
-            counter += 1
             prob = Problem(
                 dataset_id=self.dataset_id,
                 problem=corr.problem,
@@ -118,11 +105,10 @@ class Checker(object):
 
             db_add_commit(prob)
 
-        self.logger.info("Saved %d problems to DB", counter)
+        self.logger.info("Saved %d problems to DB", len(self.review_list))
 
     def check_article(self, checker_article):
         if not checker_article.resolved:
-            self.check_article_duplicate(checker_article)
             self.check_doi(checker_article)
             self.check_pmid(checker_article)
             self.check_journal(checker_article)
@@ -137,7 +123,7 @@ class Checker(object):
 
     def check_reject_article(self, article):
         return (
-            bool(Retraction.query.filter_by(article_doi=article.doi).all())
+            bool(Retraction.query.filter_by(article_doi=article.doi).first())
             if article.doi
             else None
         )
@@ -151,7 +137,7 @@ class Checker(object):
          2 - This a potentially new compound
         """
         if self.check_reject_compound(checker_compound):
-            checker_compound.resolve = ResolveEnum.reject.value
+            checker_compound.resolve = ResolveEnum.REJECT.value
             commit()
 
         # If this compound has been checked and resolve don't worry about it's structure
@@ -210,7 +196,7 @@ class Checker(object):
                             comp_id=checker_compound.id,
                         )
                 else:
-                    checker_compound.resolve = ResolveEnum.update.value
+                    checker_compound.resolve = ResolveEnum.UPDATE.value
 
         self.check_source_organism(checker_compound)
         commit()
@@ -228,10 +214,10 @@ class Checker(object):
     @staticmethod
     def create_checker_article(article, standardize=False, restart=False):
         # Start fresh if not restarting
-        if article.checker_article and not restart:
-            db.session.delete(article.checker_article)
-            commit()
         if not restart:
+            if article.checker_article:
+                db.session.delete(article.checker_article)
+                commit()
             check_art = CheckerArticle(
                 id=article.id,
                 pmid=article.pmid,
@@ -299,27 +285,12 @@ class Checker(object):
                 source_species=species,
                 npaid=db_compound.npaid,
             )
-            # Need more robust solution
-            # self.parse_external_ids(check_compound, db_compound)
 
             db_add_commit(check_compound)
         else:
             check_compound = db_compound.checker_compound
 
         return check_compound
-
-    @staticmethod
-    def get_checker_compound_cid(checker_compound):
-        checker_compound.pubchem_id = pubchem_search.get_cid_from_inchikey(
-            checker_compound.inchikey
-        )
-
-    @staticmethod
-    def parse_external_ids(checker_compound, db_compound):
-        note = str(db_compound.article[0].notes)
-        checker_compound.mibig_id = find_mibig_id(note)
-        checker_compound.pubchem_id = find_pubchem_cid(note)
-        checker_compound.berdy_id = find_berdy_id(note)
 
     def default_logger(self, *args, **kwargs):
         """Logging util function
@@ -348,6 +319,8 @@ class Checker(object):
             match = regexp.match(checker_article.doi)
             if not match:
                 self.add_problem(checker_article.id, "doi")
+        else:
+            self.add_problem(checker_article.id, "missing_doi")
 
     def check_pmid(self, checker_article):
         # Make sure integer
@@ -359,6 +332,8 @@ class Checker(object):
         if journal:
             checker_article.journal = journal.journal
             checker_article.journal_abbrev = journal.abbrev
+            if not journal.journal in self.atlas_journals:
+                self.add_problem(checker_article.id, "missing_journal")
         else:
             self.add_problem(checker_article.id, "journal")
 
@@ -415,7 +390,7 @@ class Checker(object):
             self.add_problem(checker_article.id, "title")
 
     def check_abstract(self, checker_article):
-        # If abstract, should be min 10 char
+        # If abstract, should be min 20 char
         # Probably should be more!
         # "No abstract" is common
         if checker_article.abstract:
@@ -423,29 +398,25 @@ class Checker(object):
                 self.add_problem(checker_article.id, "abstract")
 
     def check_source_organism(self, checker_compound):
-        genus = Genus.check_genus_match(checker_compound.source_genus)
-        if genus:
-            checker_compound.source_genus = genus.genus
-        else:
-
+        taxa = atlas_api.search_taxa(checker_compound.source_genus)
+        if len(taxa) == 1:
+            checker_compound.atlas_taxon_id = taxa[0]["id"]
+        elif len(taxa) > 1:
             self.add_problem(
-                checker_compound.get_article_id(), "genus", comp_id=checker_compound.id
+                checker_compound.get_article_id(),
+                "mutliple_taxa",
+                comp_id=checker_compound.id,
             )
-
-    def check_article_duplicate(self, check_article):
-        if not check_article.npa_artid:
-            npart_id = None
-
-            if check_article.doi:
-                npart_id = self.npa_artid_from_article_doi(check_article)
-                if npart_id:
-                    check_article.npa_artid = npart_id
-                    commit()
-            if not npart_id:
-                npart_id = self.npa_artid_from_article_title(check_article)
-                if npart_id:
-                    check_article.npa_artid = npart_id
-                    commit()
+        else:
+            tax = Taxon.search_alternatives(checker_compound.source_genus)
+            if tax:
+                checker_compound.atlas_taxon_id = tax.atlas_taxon_id
+            else:
+                self.add_problem(
+                    checker_compound.get_article_id(),
+                    "genus",
+                    comp_id=checker_compound.id,
+                )
 
     def compound_flat_match(self, compound):
         """
@@ -485,38 +456,6 @@ class Checker(object):
             changed = compound.inchikey != res.get("inchikey")
         return changed
 
-    # TODO: Replace this logic
-    def npa_artid_from_article_doi(self, article):
-        """
-        Query NP Atlas DB and see if an article already exists
-        without the article having and npartid
-        Return npa_artid value or None
-        """
-        sess = self.atlasdb.startSession()
-        res = (
-            sess.query(atlasdb.Reference)
-            .filter(atlasdb.Reference.doi == article.doi)
-            .first()
-        )
-        sess.close()
-        return res.id if res else None
-
-    # TODO: Replace this logic
-    def npa_artid_from_article_title(self, article):
-        """
-        Query NP Atlas DB and see if an article already exists
-        without the article having and npartid
-        Return npa_artid value or None
-        """
-        sess = self.atlasdb.startSession()
-        res = (
-            sess.query(atlasdb.Reference)
-            .filter(atlasdb.Reference.title == article.title)
-            .first()
-        )
-        sess.close()
-        return res.id if res else None
-
 
 class Correction(object):
     """
@@ -534,23 +473,28 @@ class Correction(object):
 
     @staticmethod
     def verify_problem(problem):
+        # fmt: off
         assert (
-            problem == "doi"
-            or problem == "pmid"
-            or problem == "journal"
-            or problem == "year"
-            or problem == "volume"
-            or problem == "issue"
-            or problem == "authors"
-            or problem == "title"
-            or problem == "pages"
-            or problem == "abstract"
-            or problem == "duplicate"
-            or problem == "flat_match"
-            or problem == "genus"
-            or problem == "name_match"
-            or problem == "internal_duplicate"
+            problem == "doi"                    # DOI formatting
+            or problem == "missing_doi"         # No DOI present
+            or problem == "pmid"                # PMID formatting
+            or problem == "journal"             # Journal not in Checker
+            or problem == "missing_journal"     # Journal not in Atlas
+            or problem == "year"                # Year formatting
+            or problem == "volume"              # Volume formatting
+            or problem == "issue"               # Issue formatting
+            or problem == "authors"             # Author string formatting
+            or problem == "title"               # Title formatting
+            or problem == "pages"               # Page formatting
+            or problem == "abstract"            # Abstract formatting
+            or problem == "duplicate"           # Duplicate entry to Atlas
+            or problem == "flat_match"          # Flat match entry with Atlas
+            or problem == "genus"               # TODO
+            or problem == "mutliple_taxa"       # TODO
+            or problem == "name_match"          # Name matches Atlas
+            or problem == "internal_duplicate"  # Internal dataset InChIKey duplicate
         )
+        # fmt: on
 
 
 # =============================================================================
@@ -569,45 +513,6 @@ def commit():
     except Exception as e:
         db.session.rollback()
         raise e
-
-
-def find_mibig_id(note):
-    """
-    Search note string for BGC string
-    """
-    return find_id_string("BGC[0-9]+", note)
-
-
-def find_pubchem_cid(note):
-    """
-    Search note string for CID string
-    """
-    return find_id_string("CID[0-9]+", note)
-
-
-def find_berdy_id(note):
-    """
-    Search note string for BERDY string
-    """
-    return find_id_string("BERDY[0-9]+", note)
-
-
-def find_id_string(regexp_string, input_string):
-    result = re.search(regexp_string, input_string)
-    if result:
-        return get_id_int(result.group())
-    else:
-        return None
-
-
-def get_id_int(id_string):
-    """
-    Take an ID string like BGC000001 and return integer value
-    """
-    try:
-        return int(re.sub("[A-Za-z]+", "", id_string))
-    except AttributeError:
-        return None
 
 
 def clean_doi(doi):
@@ -631,6 +536,7 @@ def has_numbers(input_string):
 
 
 def split_source_organism(org_string):
+    org_string = org_string.strip()
     data = [x for x in org_string.split(" ") if x]
     # Check data makes sense
     if len(data) > 1:

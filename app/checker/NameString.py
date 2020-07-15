@@ -30,6 +30,7 @@ class NameString(object):
         self.set_name(name)
 
     def set_name(self, name):
+        name = name.strip()
         self.name = name
         self.lower_name = name.lower()
 
