@@ -12,7 +12,10 @@ from . import data
 from .. import celery, db
 from ..models import Article, Compound, Curator, Dataset, dataset_article
 from ..utils.NoneDict import NoneDict
+from ..utils import slack_notifier
 from .forms import ArticleForm
+
+slack_notify = os.getenv("SLACK_WEBHOOK_URL")
 
 
 #####################################################################
@@ -221,6 +224,8 @@ def article(cur_id, ds_id, art_id):
         if len([art for art in dataset.articles if art.completed]) == len(dataset.articles):
             dataset.completed = True
             flash('Dataset completed!!')
+            if slack_notify is not None:
+                slack_notifier.send_dataset_complete(dataset)
         elif dataset.articles.index(article) == len(dataset.articles) - 1:
             skip = True
             flash("Please go back and complete unfinished articles!")
