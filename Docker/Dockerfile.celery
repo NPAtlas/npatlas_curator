@@ -1,5 +1,0 @@
-FROM atlas-curator:v3.1.dev
-
-RUN useradd -ms /bin/bash celery
-
-CMD /bin/bash -c "source activate curator && celery worker -A celery_worker.celery --loglevel=info --uid celery "

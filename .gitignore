@@ -12,8 +12,7 @@ dh-params/
 .mypy_cache/
 data/
 
-# For playground purposes
-curator_env/
+*.env
 
 # Self signed certs for test deployment
 certs/

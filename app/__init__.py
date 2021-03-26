@@ -1,26 +1,22 @@
-import os
 import logging
+
+from celery import Celery
 from flask import Flask, render_template
 from flask_bootstrap import Bootstrap
+from flask_caching import Cache
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
-from flask_caching import Cache
-from celery import Celery
 
 # local imports
-from config import app_config
-
-REDISSERVER = os.environ.get("REDIS", "127.0.0.1")
-app_config["CELERY_BROKER_URL"] = "redis://{}:6379".format(REDISSERVER)
-app_config["CELERY_RESULT_BACKEND"] = "redis://{}:6379".format(REDISSERVER)
+from .config import REDIS_DATABASE_URI, app_config
 
 # initialze app variables
 bootstrap = Bootstrap()
 celery = Celery(
     __name__,
-    broker=app_config["CELERY_BROKER_URL"],
-    backend=app_config["CELERY_RESULT_BACKEND"],
+    broker=REDIS_DATABASE_URI,
+    backend=REDIS_DATABASE_URI,
 )
 db = SQLAlchemy()
 login_manager = LoginManager()

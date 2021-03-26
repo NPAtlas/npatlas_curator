@@ -1,8 +1,56 @@
 import os
 
+
+class Config(object):
+    """
+    Common configurations
+    """
+
+    DEBUG = True
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+
+
+class DevelopmentConfig(Config):
+    """
+    Development configurations
+    """
+
+    # SQLALCHEMY_ECHO = True
+    # LOGIN_DISABLED = True
+
+
+class ProductionConfig(Config):
+    """
+    Production configurations
+    """
+
+    DEBUG = False
+
+
+class TestingConfig(Config):
+    """
+    Testing configurations
+    """
+
+    TESTING = True
+
+
+app_config = {
+    "default": DevelopmentConfig,
+    "development": DevelopmentConfig,
+    "production": ProductionConfig,
+    "testing": TestingConfig,
+}
+
 DBSERVER = os.getenv("DBSERVER", "127.0.0.1")
+DBUSER = os.getenv("DBUSER", "jvansan")
+DBPASSWORD = os.getenv("DBPASSWORD", "jvansan")
 SECRET_KEY = os.urandom(24)
-SQLALCHEMY_DATABASE_URI = f"mysql+pymysql://jvansan:jvansan@{DBSERVER}/npatlas_curation"
+SQLALCHEMY_DATABASE_URI = (
+    f"mysql+pymysql://{DBUSER}:{DBPASSWORD}@{DBSERVER}/npatlas_curation"
+)
+REDISSERVER = os.getenv("REDIS", "127.0.0.1")
+REDIS_DATABASE_URI = "redis://{}:6379".format(REDISSERVER)
 # THESE SHOULD NOT BE DEFAULTS
 API_BASE_URL = os.getenv("API_BASE_URL")
 API_USERNAME = os.getenv("API_USERNAME")
