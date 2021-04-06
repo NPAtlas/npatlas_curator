@@ -1,6 +1,6 @@
 NAME := atlas_curator
 # VERSION := $(shell git describe --tags)
-VERSION := 3.2.1
+VERSION := 3.2.2
 REGISTRY := registry.jvansan.duckdns.org
 
 all: build-docker push
