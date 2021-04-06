@@ -1,4 +1,6 @@
-# NP Atlas Curator (v3) WEB APP EDITION
+# NP Atlas Curator WEB APP EDITION
+
+_Version 3.2.1_
 
 ## Changes
 

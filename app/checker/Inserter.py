@@ -2,7 +2,7 @@ import datetime
 import logging
 import os
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 from decimal import Decimal
 from enum import Enum
 from typing import Dict, List, Optional
@@ -189,7 +189,7 @@ class Inserter:
                     self.reject_dataset()
         e_string = "No errors"
         if self.errors:
-            e_string = json.dumps([e.asdict() for e in self.errors])
+            e_string = json.dumps([asdict(e) for e in self.errors])
             self.logger.error(e_string)
             dataset.checker_dataset.errors = e_string
         dataset.checker_dataset.inserted = True
