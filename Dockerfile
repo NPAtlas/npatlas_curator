@@ -23,4 +23,4 @@ RUN useradd -ms /bin/bash uwsgi
 COPY app/ ./app/
 COPY run.py celery_worker.py ./
 
-CMD /bin/bash -c "source activate curator && gunicorn -w 4 -b 0.0.0.0:5000 run:app"
+CMD /bin/bash -c "source activate curator && gunicorn -w 4 -b 0.0.0.0:5000 run:app --access-logfile /dev/stdout --preload"

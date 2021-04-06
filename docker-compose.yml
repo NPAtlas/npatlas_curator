@@ -22,7 +22,7 @@ services:
       - $HOME/docker_volumes/acme/:/acme/
 
   site:
-    image: registry.jvansan.duckdns.org/atlas_curator:3.2.1
+    image: registry.jvansan.duckdns.org/atlas_curator:3.2.2
     restart: always
     env_file:
       - ./flask.env
@@ -30,13 +30,12 @@ services:
       - traefik.http.services.curator.loadbalancer.server.port=5000
       - traefik.http.routers.curator.entrypoints=web
       - traefik.http.routers.curator.rule=PathPrefix(`/`)
-      # - "traefik.http.middlewares.curator-gzip.compress=true"
-      # - "traefik.http.routers.curator.middlewares=curator-gzip@docker"
-    command: [/opt/conda/bin/conda, run, --no-capture-output, -n, curator, flask, run, --host=0.0.0.0]
+      - "traefik.http.middlewares.curator-gzip.compress=true"
+      - "traefik.http.routers.curator.middlewares=curator-gzip@docker"
 
 
   celery:
-    image: registry.jvansan.duckdns.org/atlas_curator:3.2.1
+    image: registry.jvansan.duckdns.org/atlas_curator:3.2.2
     restart: always
     env_file:
       - ./flask.env
