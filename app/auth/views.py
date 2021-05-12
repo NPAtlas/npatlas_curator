@@ -24,7 +24,7 @@ def login():
         curator = Curator.query.filter_by(username=form.username.data).first()
         if curator and curator.verify_password(form.password.data):
             # login
-            login_user(curator)
+            login_user(curator, remember=True)
 
             # redirect to appropriate place
             if curator.is_admin:
