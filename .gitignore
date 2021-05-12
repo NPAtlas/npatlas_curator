@@ -11,7 +11,7 @@ dh-params/
 .pytest_cache/
 .mypy_cache/
 data/
-
+docker_volumes/
 *.env
 
 # Self signed certs for test deployment
