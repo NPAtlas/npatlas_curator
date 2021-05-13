@@ -1,13 +1,15 @@
+from app import data
+import json
 from functools import wraps
 
-from flask import abort, flash, redirect, render_template, request, url_for, current_app
+from flask import abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from pydantic import ValidationError
 
-from . import admin
 from .. import db
-from ..data import data
-from ..data.forms import ArticleForm, CompoundForm
+from ..data.forms import ArticleForm
 from ..models import Article, Compound, Curator, Dataset
+from . import admin, schemas
 from .forms import CuratorForm, DatasetForm
 
 
@@ -53,7 +55,7 @@ def list_datasets():
     return render_template(
         "admin/datasets.html",
         datasets=datasets,
-        title="Add Datasets",
+        title="List Datasets",
         next_url=next_url,
         prev_url=prev_url,
     )
@@ -269,3 +271,57 @@ def edit_dataset(id):
 
     return render_template("admin/edit_dataset.html", form=form)
 
+
+def allowed_file(filename):
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ("json")
+
+
+def create_dataset_from_schema(dataset: schemas.Dataset) -> Dataset:
+    """Compose Flask-Sqlachemy instances from schema"""
+    ds = Dataset(instructions=dataset.instructions)
+    for art in dataset.articles:
+        art_dict = art.dict()
+        art_compounds = art_dict.pop("compounds")
+        compounds = [Compound(**c) for c in art_compounds]
+        article = Article(**art_dict)
+        article.compounds = compounds
+        ds.articles.append(article)
+    return ds
+
+
+@admin.route("/admin/datasets/add/", methods=["GET", "POST"])
+@login_required
+@require_admin
+def add_dataset():
+    """
+    Add a dataset by uploading JSON file
+    """
+    json_schema = schemas.Dataset.schema_json(indent=2)
+    if request.method == "POST":
+        if "file" not in request.files:
+            flash("No file part")
+            return redirect(request.url)
+        file = request.files["file"]
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == "":
+            flash("No selected file")
+            return redirect(request.url)
+        if file and allowed_file(file.filename):
+            data = json.load(file.stream)
+            try:
+                ds_schema = schemas.Dataset(**data)
+                print(ds_schema)
+            except ValidationError as e:
+                flash(f"Invalid JSON Error: {e.json()}")
+                return redirect(request.url)
+            except TypeError:
+                flash("Invalid JSON Error: The base is not an Object.")
+                return redirect(request.url)
+            ds = create_dataset_from_schema(ds_schema)
+            db.session.add(ds)
+            db.session.commit()
+            flash(f"Dataset added with {len(ds.articles)} articles!")
+            return redirect(request.url)
+
+    return render_template("admin/add_dataset.html", json_schema=json_schema)

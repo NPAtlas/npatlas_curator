@@ -1,0 +1,29 @@
+{% import "bootstrap/utils.html" as utils %}
+{% extends "base.html" %}
+{% block title %}Data Dashboard{% endblock %}
+{% block body %}
+<br>
+{{ utils.flashed_messages() }}
+<br>
+<div class="container">
+    <h1 style="text-align: center;">Add Dataset</h1>
+    <form method="POST" action="" enctype="multipart/form-data">
+        <p>
+            <input type="file" name="file" accept=".json">
+        </p>
+        <p>
+            <input type="submit" value="Submit" class="btn btn-primary">
+        </p>
+    </form>
+</div>
+<div class="container">
+    <div class="row">
+        <p>The JSON Schema is:</p>
+    </div>
+    <div class="row">
+        <pre>
+{{ json_schema }}
+        </pre>
+    </div>
+</div>
+{% endblock %}
