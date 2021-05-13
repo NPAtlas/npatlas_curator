@@ -1,6 +1,6 @@
 FROM continuumio/miniconda3
 
-LABEL Name=curator Version=3.2.2
+LABEL Name=curator Version=3.3.0
 WORKDIR /curator
 COPY requirements.txt /curator
 
