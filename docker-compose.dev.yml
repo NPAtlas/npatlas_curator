@@ -21,17 +21,21 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   site:
-    image: registry.jvansan.duckdns.org/atlas_curator:3.3.1
+    image: registry.jvansan.duckdns.org/atlas_curator:3.3.2
     restart: always
     env_file:
       - ./flask.env
     labels:
       - traefik.http.routers.curator.rule=PathPrefix(`/`)
+    volumes:
+      - ./app:/curator/app
+      - ./migrations:/curator/migrations
+      - ./tests:/curator/tests
     command: [/opt/conda/bin/conda, run, --no-capture-output, -n, curator, flask, run, --host=0.0.0.0]
 
 
   celery:
-    image: registry.jvansan.duckdns.org/atlas_curator:3.3.1
+    image: registry.jvansan.duckdns.org/atlas_curator:3.3.2
     restart: always
     env_file:
       - ./flask.env

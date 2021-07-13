@@ -1,0 +1,260 @@
+{
+  "instructions": "TRAINING SET: Upon completion please complete and contact admin. Note: you will receive a score and feedback at the end of this set.",
+  "articles": [
+    {
+      "pmid": null,
+      "doi": "10.1080/10575639708043695",
+      "journal": "Nat. Prod. Lett.",
+      "year": "1997",
+      "volume": "10",
+      "issue": "1",
+      "pages": "49-54",
+      "authors": "Donoso, R; Rivera-sagredo, A; Hueso-Rodrigues, JA; Elson, SW",
+      "title": "New Chaetoglobosin Isolated from A Fungus of the Genus Discosia",
+      "abstract": "A new chaetoglobosin, named chaetoglobosin P (1) has been isolated from a fungus of the genus Discosia and its structure elucidated by spectroscopic analysis in comparison with published spectroscopic data for other chaetoglobosins.",
+      "compounds": [
+        {
+          "name": "Chaetoglobosin P",
+          "smiles": "CC(C)C[C@@H]1C2=NC(=CS2)C(=O)N[C@@H](C(=O)N[C@H](C3=NC(=CS3)C(=O)NCC(=O)NCC(=O)NCC(=O)NC(C(=O)N[C@H](C(=O)N[C@H](C4=NC(=CS4)C(=O)N1)C(C)C)CC5=CC=CC=C5)C(C)C)CC(=O)N)CC6=CC=C(C=C6)O",
+          "source_organism": "Discosia sp."
+        }
+      ]
+    },
+    {
+      "pmid": null,
+      "doi": "10.1073/pnas.77.7.3957",
+      "journal": "Proceedings of the National Academy of Sciences of the United States of America",
+      "year": "1980",
+      "volume": "77",
+      "issue": "7",
+      "pages": "3957-3961",
+      "authors": "Alberts, A W; Chen, J; Kuron, G; Hunt, V; Huff, J; Hoffman, C; Rothrock, J; Lopez, M; Joshua, H; Harris, E; Patchett, A; Monaghan, R; Currie, S; Stapley, E; Albers-Schonberg, G; Hensens, O; Hirshfield, J; Hoogsteen, K; Liesch, J; Springer, J",
+      "title": "Mevinolin: a highly potent competitive inhibitor of hydroxymethylglutaryl-coenzyme A reductase and a cholesterol-lowering agent",
+      "abstract": "Mevinolin, a fungal metabolite, was isolated from cultures of Aspergillus terreus. The structure and absolute configuration of mevinolini and its open acid form, mevinolinic acid, were determined by a combination of physical techniques. Mevinolin was shown to be 1,2,6,7,8,8a-hexahydro-beta, delta-dihydroxy-2,6-dimethyl-8-(2-methyl-1-oxobutoxy)-1-naphthalene-hepatanoic acid delta-lactone. Mevinolin in the hydroxy-acid form, mevinolinic acid, is a potent competitive inhibitor of 3-hydroxy-3-methylglutaryl-coenzyme A reductase [mevalonate: NADP+ oxidoreductase (CoA-acylating), EC 1.1.1.34]; its Ki of 0.6 nM can be compared to 1.4 nM for the hydroxy acid form of the previously described related inhibitor, ML-236B (compactin, 6-demethylmevinolin). In the rat, orally administered sodium mevinolinate was an active inhibitor of cholesterol synthesis in an acute assay (50% inhibitory dose = 46 microgram/kg). Furthermore, it was shown that mevinolin was an orally active cholesterol-lowering agent in the dog. Treatment of dogs for 3 weeks with mevinolin at 8 mg/kg per day resulted in a 29.3 +/- 2.5% lowering of plasma cholesterol.",
+      "compounds": [
+        {
+          "name": "Mevinolinic acid",
+          "smiles": "[H][C@]12[C@H](C[C@@H](C)C=C1C=C[C@H](C)[C@@H]2CC[C@@H](O)C[C@@H](O)CC(O)=O)OC(=O)[C@H](C)CC",
+          "source_organism": "Aspergillus terreus"
+        },
+        {
+          "name": "Mevinolin",
+          "smiles": "CC[C@H](C)C(=O)O[C@H]1C[C@H](C=C2[C@H]1[C@H]([C@H](C=C2)C)CC[C@@H]3C[C@H](CC(=O)O3)O)C",
+          "source_organism": "Aspergillus terreus"
+        }
+      ]
+    },
+    {
+      "pmid": null,
+      "doi": "10.1016/s0040-4039(00)70715-5",
+      "journal": "Tetrahedron Letters",
+      "year": "1989",
+      "volume": "30",
+      "issue": "52",
+      "pages": "7427-7430",
+      "authors": "Abraham, S. P.; Hoang, T. D.; Alam, M.; Jones, E. B. G.",
+      "title": "Structures of novel antibiotics, furaquinocins A and B",
+      "abstract": "Structures of novel citocydal antibiotics furaquinocins A and B, isolated from the fermentation broth of Streptomyces sp. KO-3988, was elucidated on the basis of spectroscopic analyses.",
+      "compounds": [
+        {
+          "name": "Furaquinocin A",
+          "smiles": "C[C@@H]1[C@](C2=C(C=C3C(=C2O1)C(=O)C(=C(C3=O)OC)C)O)(C)[C@@H](C/C=C(/C)\\CO)O",
+          "source_organism": "Streptomyces sp. KO-3988"
+        },
+        {
+          "name": "Furaquinocin B",
+          "smiles": "COC1=C(C)C(=O)C2=C(C=C(O)C3=C2O[C@@H](C)[C@@]3(C)C(O)C\\C=C(/C)CO)C1=O",
+          "source_organism": "Streptomyces sp. KO-3988"
+        }
+      ]
+    },
+    {
+      "pmid": null,
+      "doi": "10.1021/acs.orglett.5b02964",
+      "journal": "Organic Letters",
+      "year": "2016",
+      "volume": "18",
+      "issue": "2",
+      "pages": "244-247",
+      "authors": "Yu, Guihong; Zhou, Guoliang; Zhu, Meilin; Wang, Wei; Zhu, Tianjiao; Gu, Qianqun; Li, Dehai",
+      "title": "Neosartoryadins A and B, Fumiquinazoline Alkaloids from a Mangrove-Derived Fungus Neosartorya udagawae HDN13-313",
+      "abstract": "Neosartoryadins A (1) and B (2), both with a unique 6/6/6/5 quinazoline ring system connected directly to a 6/5/5 imidazoindolone ring, together with three biogenetically related compounds 3\u20135, were isolated from the endophytic fungus Neosartorya udagawae HDN13-313. The absolute configurations of new compounds 1\u20134 were established. Compounds 1 and 2 displayed anti-influenza virus A (H1N1) activities with IC50 values of 66 and 58 \u03bcM, respectively (ribavirin as positive control, IC50 = 94 \u03bcM).",
+      "compounds": [
+        {
+          "name": "Neosartoryadin A",
+          "smiles": "[H][C@@]12NC(C)(C)C(=O)N1C1=CC=CC=C1[C@@]21C[C@@]2([H])N3C(=O)C4=CC=CC=C4N=C3C(=O)C(C)(C)[C@@]2(O)O1",
+          "source_organism": "Neosartorya udagawae HDN13-313"
+        },
+        {
+          "name": "Neosartoryadin B",
+          "smiles": "[H][C@@]12C[C@]3(O[C@]1(O)C(C)(C)C(=O)C1=NC4=CC=CC=C4C(=O)N21)C1=CC=CC=C1N1C(=O)C(C)(C)N(O)[C@@]31[H]",
+          "source_organism": "Neosartorya udagawae HDN13-313"
+        },
+        {
+          "name": "Fiscalin E",
+          "smiles": "[H][C@@]12NC(C)(C)C(=O)N1C1=CC=CC=C1[C@@]2(O)C[C@H]1N2C(=O)C3=CC=CC=C3N=C2[C@](NC1=O)(OC)C(C)C",
+          "source_organism": "Neosartorya udagawae HDN13-313"
+        }
+      ]
+    },
+    {
+      "pmid": null,
+      "doi": "10.1248/cpb.19.2289 ",
+      "journal": "Chemical and Pharmaceutical Bulletin",
+      "year": "1971",
+      "volume": "19",
+      "issue": "11",
+      "pages": "2289-2293",
+      "authors": "KARIYONE, KAZUO; YAZAWA, HISATOYO; KOHSAKA, MASANOBU",
+      "title": "The structures of tomaymycin and oxotomaymycin",
+      "abstract": "Tomaymycin (2) and oxotomaymycin (3) are antibiotics isolated from Streptomyces achromogenes var. Tomaymycetics. The structure of tomaymycin (2) was determined by degradation reactions together with spectral analysis and by synthesis of the important derivative (8b) containing the basic skeleton of the antibiotic. The structure of oxotomaymycin (3) was also established by chemical correlation to the derivative (7a) of tomaymycin.",
+      "compounds": [
+        {
+          "name": "Oxotomaymycin",
+          "smiles": "C/C=C/1\\C[C@H]2C(=O)NC3=CC(=C(C=C3C(=O)N2C1)OC)O",
+          "source_organism": "Streptomyces achromogenes var. Tomaymycetics"
+        },
+        {
+          "name": "Tomaymycin",
+          "smiles": "COC1NC2=C(C=C(OC)C(O)=C2)C(=O)N2CC(CC12)=CC",
+          "source_organism": "Streptomyces achromogenes var. Tomaymycetics"
+        }
+      ]
+    },
+    {
+      "pmid": 10495467,
+      "doi": "10.1002/(SICI)1522-7189(199903/04)7%3A2<57%3A%3AAID-NT42>3.0.CO%3B2-F",
+      "journal": "Nat. Toxins",
+      "year": "1999",
+      "volume": "7",
+      "issue": "2",
+      "pages": "57-62",
+      "authors": "Sailler, B; Glombitza, KW",
+      "title": "Halogenated phlorethols and fucophlorethols from the brown alga Cystophora retroflexa",
+      "abstract": "From an ethyl acetate fraction of the brown alga Cystophora retroflexa several halogenated phlorotannins were isolated. Most of the compounds are derivatives of diphlorethol penta-acetate and triphlorethol-A hepta-acetate. The majority turned out to be chlorinated and/or brominated. Only one iodinated substance, 2-iodophloroglucinol triacetate, was isolated. The structure of this derivative and the following compounds have been characterized previously: 2([D])-bromodiphlorethol penta-acetate, 3([A1])-bromodiphlorethol penta-acetate, 4([D])-bromo-diphlorethol penta-acetate, 4([D])-chlorodiphlorethol penta-acetate, 3([A1])-chlorotriphlorethol-A hepta-acetate, 4([D])-bromotriphlorethol-A hepta-acetate and 4([D])-chlorobisfucopentaphlorethol-A nonadeca-acetate. Ten halogenated phlorethols and two chlorinated fucophlorethols are described for the first time and characterized as their acetates: 2([B])-bromotriphlorethol-A hepta-acetate, 2([D])-bromotriphlorethol-A hepta-acetate, 2([B]), 2([D])-dibromotriphlorethol-A hepta-acetate, 3([A1]), 5([A1])-dichlorotriphlorethol-A hepta-acetate, 3([A1]), 4([D])-dichlorotriphlorethol-A hepta-acetate, 3([A1])-chloro-4([D])-bromotriphlorethol-A hepta-acetate. 2([B]), 4([D])-dichlorotriphlorethol-A hepta-acetate, 2([D]), 3([A1])-dibromotriphlorethol-A hepta-acetate, 3([A1])-bromo-2([D])-chlorotriphlorethol-A hepta-acetate, 2([D])-bromotetraphlorethol-C nona-acetate, 4([D])-chlorofucotriphlorethol-B dodeca-acetate and 4([D])-chlorobisfucotetraphlorethol-A heptadeca-acetate.",
+      "compounds": [
+        {
+          "name": "Not named",
+          "smiles": "C1=C(C=C(C(=C1O)OC2=C(C(=C(C(=C2)O)OC3=CC(=CC(=C3Br)O)O)O)Br)O)O",
+          "source_organism": "Cystophora retroflexa"
+        },
+        {
+          "name": "Not named",
+          "smiles": "C1=C(C=C(C=C1O)OC2=C(C=C(C=C2O)OC3=C(C(=C(C=C3O)O)Cl)O)O)O",
+          "source_organism": "Cystophora retroflexa"
+        },
+        {
+          "name": "Not named",
+          "smiles": "C1=C(C=C(C(=C1O)C2=C(C(=C(C=C2OC3=C(C=C(C=C3O)O)O)O)OC4=CC(=CC(=C4OC5=CC(=C(C(=C5)O)Cl)O)O)O)O)O)O",
+          "source_organism": "Cystophora retroflexa"
+        }
+      ]
+    },
+    {
+      "pmid": null,
+      "doi": "10.1021/ja00166a066",
+      "journal": "Journal of the American Chemical Society",
+      "year": "1990",
+      "volume": "112",
+      "issue": "10",
+      "pages": "4061-4063",
+      "authors": "Moore, Bradley S; Chen, Jian Lu; Patterson, Gregory ML; Moore, Richard E; Brinen, Linda S; Kato, Yoko; Clardy, Jon",
+      "title": "[7.7] Paracyclophanes from blue-green algae",
+      "abstract": null,
+      "compounds": [
+        {
+          "name": "Nostocyclophane D",
+          "smiles": "CCCC[C@H]1CCC[C@@H](Cl)C[C@@H](OC)C2=CC(O)=C([C@@H](CCCC)CCC[C@@H](Cl)C[C@@H](OC)C3=CC(O)=C1C(O)=C3)C(O)=C2",
+          "source_organism": "Cylindrospermum licheniforme ATCC 29204"
+        }
+      ]
+    },
+    {
+      "pmid": null,
+      "doi": "10.1021/ja0268985",
+      "journal": "Journal of the American Chemical Society",
+      "year": "2002",
+      "volume": 124,
+      "issue": 34,
+      "pages": "9968-9969",
+      "authors": "Brady, Sean F.; Chao, Carol J.; Clardy, Jon",
+      "title": "New natural product families from an environmental DNA (eDNA) gene cluster",
+      "abstract": "Uncultured bacteria represent a potentially rich source of new and useful natural products. Studying these natural products requires the development of effective yet straightforward methods to access the small-molecule chemical diversity produced by uncultured bacteria. In this study, DNA extracted directly from soil samples (environmental DNA, eDNA) was used to construct cosmid libraries in Escherichia coli, and these clones were then assayed for the production of antibiosis. A 13 open reading frame (ORF) biosynthetic gene cluster (feeA-M) found in one of the antibacterial active clones, CSLC-2, confers to E. coli the production of two new families of natural products that are derived from long chain N-acyltyrosines. The fee gene cluster and three families of the long chain acyl phenols derived from tyrosine (families 1, 2, and 3) are described.",
+      "compounds": [
+        {
+          "name": "Not named",
+          "smiles": "CCCCCCCCCCCCCCCC(=O)OC=CC1=CC=C(O)C=C1",
+          "source_organism": "eDNA sp."
+        },
+        {
+          "name": "Not named",
+          "smiles": "CCCCCCCCCCCCCCCC(=O)N/C=C/C1=CC=C(C=C1)O",
+          "source_organism": "eDNA sp."
+        }
+      ]
+    },
+    {
+      "pmid": null,
+      "doi": "10.1016/s0040-4039(01)82947-6",
+      "journal": "Tetrahedron Letters",
+      "year": "1981",
+      "volume": "22",
+      "issue": "43",
+      "pages": "4327-4330",
+      "authors": "Conca, E.; Bernardi, M. De; Fronza, G.; Girometta, M. A.; Mellerio, G.; et al.",
+      "title": "FUNGAL METABOLITES 10. NEW CHROMENES FROM LACTARIUS FULIGINOSUS FRIES AND LACTARIUS PICINUS FRIES",
+      "abstract": null,
+      "compounds": [
+        {
+          "name": "6-Methoxy-8<2'-methoxy-4'(3''-methyl-2''-butenyl)phenoxy>2,2-dimethylchromene",
+          "smiles": "COC1=CC(OC2=CC=C(CC=C(C)C)C=C2OC)=C2OC(C)(C)C=CC2=C1",
+          "source_organism": "Lactarius fuliginosus"
+        },
+        {
+          "name": "6-Methoxy-8<6'-hydroxy-2'-methoxy-4'(3''-methyl-2''-butenyl)phenyl>2,2-dimethylchromene",
+          "smiles": "COC1=CC(=C2OC(C)(C)C=CC2=C1)C1=C(O)C=C(CC=C(C)C)C=C1OC",
+          "source_organism": "Lactarius fuliginosus"
+        },
+        {
+          "name": "8,8'-Bis(6-methoxy-2,2-dimethylchromene)",
+          "smiles": "COC1=CC(=C2OC(C)(C)C=CC2=C1)C1=CC(OC)=CC2=C1OC(C)(C)C=C2",
+          "source_organism": "Lactarius fuliginosus"
+        },
+        {
+          "name": "6-Methoxy-8<6'-hydroxy-2'-methoxy-4'(3''-methyl-2''-butenyl)phenoxy>2,2-dimethylchromene",
+          "smiles": "COC1=CC(OC2=C(O)C=C(CC=C(C)C)C=C2OC)=C2OC(C)(C)C=CC2=C1",
+          "source_organism": "Lactarius fuliginosus"
+        }
+      ]
+    },
+    {
+      "pmid": null,
+      "doi": "10.1016/s0031-9422(96)00433-5",
+      "journal": "Phytochemistry",
+      "year": "1996",
+      "volume": "43",
+      "issue": "5",
+      "pages": "1015-1017",
+      "authors": "Nakajima, Hiromitsu; Shimomura, Koryu; Furumoto, Toshio; Hamasaki, Takashi",
+      "title": "Neovasipyridones related to neovasinin, a phytotoxin of the fungus Neocosmospora",
+      "abstract": null,
+      "compounds": [
+        {
+          "name": "Neovasipyridone D",
+          "smiles": "CCC(C)C=C(C)C1N(CCC2=CC=CC=C2)C=C(C(=O)CC)C(=O)C1(C)O",
+          "source_organism": "Neocosmospora vasinfecta NHL2298"
+        },
+        {
+          "name": "Neovasipyridone E",
+          "smiles": "CCC(C)C=C(C)C1N(CC)C=C(C(=O)CC)C(=O)C1(C)O",
+          "source_organism": "Neocosmospora vasinfecta NHL2298"
+        },
+        {
+          "name": "neovasipyridone F",
+          "smiles": "CCC(C)/C=C(/C)\\C1C(C(=O)C(=CN1CCCC(=O)N)C(=O)CC)(C)O",
+          "source_organism": "Neocosmospora vasinfecta NHL2298"
+        }
+      ]
+    }
+  ]
+}

@@ -1,6 +1,7 @@
 from app import data
 import json
 from functools import wraps
+from pathlib import Path
 
 from flask import abort, current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
@@ -11,6 +12,8 @@ from ..data.forms import ArticleForm
 from ..models import Article, Compound, Curator, Dataset
 from . import admin, schemas
 from .forms import CuratorForm, DatasetForm
+
+HERE = Path(__file__).parent
 
 
 def require_admin(func):
@@ -178,6 +181,10 @@ def add_curator():
         )
         try:
             db.session.add(curator)
+            with HERE.joinpath("npatlas_training_set_v2.json").open() as f:
+                data = json.load(f)
+                ds = add_dataset_to_db(data, commit=False)
+                ds.curator = curator
             db.session.commit()
             flash(
                 "You have successfully added a new curator.\nNote the password is {}".format(
@@ -310,18 +317,23 @@ def add_dataset():
         if file and allowed_file(file.filename):
             data = json.load(file.stream)
             try:
-                ds_schema = schemas.Dataset(**data)
-                print(ds_schema)
+                ds = add_dataset_to_db(data, commit=True)
             except ValidationError as e:
                 flash(f"Invalid JSON Error: {e.json()}")
                 return redirect(request.url)
             except TypeError:
                 flash("Invalid JSON Error: The base is not an Object.")
                 return redirect(request.url)
-            ds = create_dataset_from_schema(ds_schema)
-            db.session.add(ds)
-            db.session.commit()
             flash(f"Dataset added with {len(ds.articles)} articles!")
             return redirect(request.url)
 
     return render_template("admin/add_dataset.html", json_schema=json_schema)
+
+
+def add_dataset_to_db(data, commit=False):
+    ds_schema = schemas.Dataset(**data)
+    ds = create_dataset_from_schema(ds_schema)
+    db.session.add(ds)
+    if commit:
+        db.session.commit()
+    return ds
