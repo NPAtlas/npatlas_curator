@@ -185,6 +185,7 @@ def add_curator():
                 data = json.load(f)
                 ds = add_dataset_to_db(data, commit=False)
                 ds.curator = curator
+                ds.training = 2
             db.session.commit()
             flash(
                 "You have successfully added a new curator.\nNote the password is {}".format(
