@@ -21,19 +21,19 @@ services:
       - "80:80"
       # The HTTPS port
       - "443:443"
-       # The Web UI enabled by --api.insecure=true
+        # The Web UI enabled by --api.insecure=true
       - "8080:8080"
     volumes:
       # So that Traefik can listen to the Docker events
       - /var/run/docker.sock:/var/run/docker.sock
       - "./docker_volumes/acme/:/acme/"
-    environment: 
+    environment:
       - HTTP_PROXY=http://bby-nsx-proxy.its.sfu.ca:8080
       - HTTPS_PROXY=http://bby-nsx-proxy.its.sfu.ca:8080
       - NO_PROXY=naturalproductsapi.chem.sfu.ca,127.0.0.0/8,172.24.0.0/8
 
   site:
-    image: registry.jvansan.duckdns.org/atlas_curator:3.3.2
+    image: registry.jvansan.duckdns.org/atlas_curator:3.3.3
     restart: always
     env_file:
       - ./flask.env
@@ -42,13 +42,25 @@ services:
       - traefik.http.routers.curator.tls=true
       - traefik.http.routers.curator.tls.certresolver=le
 
-
   celery:
-    image: registry.jvansan.duckdns.org/atlas_curator:3.3.2
+    image: registry.jvansan.duckdns.org/atlas_curator:3.3.3
     restart: always
     env_file:
       - ./flask.env
-    command: [/opt/conda/bin/conda, run, --no-capture-output, -n, curator, celery, -A, celery_worker.celery, worker, --loglevel=INFO, --uid=uwsgi]
+    command:
+      [
+        /opt/conda/bin/conda,
+        run,
+        --no-capture-output,
+        -n,
+        curator,
+        celery,
+        -A,
+        celery_worker.celery,
+        worker,
+        --loglevel=INFO,
+        --uid=uwsgi,
+      ]
 
   redis:
     image: redis
@@ -60,8 +72,13 @@ services:
   mysql:
     image: mysql:5.7
     restart: always
-    env_file: 
+    env_file:
       - mysql.env
-    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
+    command:
+      [
+        "mysqld",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+      ]
     volumes:
       - $HOME/docker_volumes/mysql:/var/lib/mysql
