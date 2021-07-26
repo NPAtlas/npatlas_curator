@@ -1,11 +1,8 @@
-import datetime
 import logging
-import os
 import json
 from dataclasses import dataclass, asdict
-from decimal import Decimal
 from enum import Enum
-from typing import Dict, List, Optional
+from typing import Dict, List
 from urllib.parse import quote
 
 from requests.exceptions import HTTPError
@@ -13,9 +10,8 @@ from requests.exceptions import HTTPError
 from app import config, db, models
 from app.checker import schemas
 from app.checker.ResolveEnum import ResolveEnum
-from app.models import Dataset, Journal
+from app.models import Dataset
 from app.utils import atlas_api, oauth_session
-from app.utils.Compound import Compound
 
 
 class Action(str, Enum):
@@ -234,7 +230,7 @@ class Inserter:
                 action=Action.UPDATE,
             )
 
-        if atlas_compound.get("name") != compound.name:
+        if atlas_compound.get("original_name") != compound.name:
             self._api_call(
                 f"compound/{compound.npaid}/name",
                 post_data={"name": compound.name},

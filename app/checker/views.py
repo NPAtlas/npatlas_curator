@@ -316,7 +316,9 @@ def journal_autocomplete():
 def get_all_taxa():
     data = {}
     for rank in atlas_api.get_ranks():
-        data[rank] = [x.get("name").lower() for x in atlas_api.get_rank_taxa(rank)]
+        data[rank] = [
+            x.get("original_name").lower() for x in atlas_api.get_rank_taxa(rank)
+        ]
     return data
 
 
@@ -542,7 +544,7 @@ def get_npa_compounds(compound):
             compounds.append(
                 NPACompound(
                     res.id,
-                    res.get("name"),
+                    res.get("original_name"),
                     atlas_api.get_compound_molblock(compound.npaid),
                     res.get("inchikey"),
                 )
@@ -555,7 +557,7 @@ def get_npa_compounds(compound):
             compounds.append(
                 NPACompound(
                     id_,
-                    r.get("name"),
+                    r.get("original_name"),
                     atlas_api.get_compound_molblock(id_),
                     r.get("inchikey"),
                 )
@@ -568,7 +570,7 @@ def get_npa_compounds(compound):
                 compounds.append(
                     NPACompound(
                         id_,
-                        r.get("name"),
+                        r.get("original_name"),
                         atlas_api.get_compound_molblock(id_),
                         r.get("inchikey"),
                     )
@@ -676,7 +678,10 @@ def save_taxon(form, compound):
         }
         try:
             client = _get_atlas_api_client()
-            r = client.post(f"{config.API_BASE_URL}/taxon/", json=post_data,)
+            r = client.post(
+                f"{config.API_BASE_URL}/taxon/",
+                json=post_data,
+            )
             r.raise_for_status()
         except Exception as e:
             flash(e)

@@ -181,7 +181,7 @@
                 </div>
                 <div class="newTaxon">
                     <p style='color: red;'>Please use NP Atlas API to determine parent Taxon ID</p>
-                    <p><a href="http://npatlas-dev.chem.sfu.ca/api/v1" target="_blank">NP Atlas Dev API</a></p>
+                    <p><a href="https://api.npatlas.org/v1/docs" target="_blank">NP Atlas Dev API</a></p>
                 </div>
                 <div class="row form-group newTaxon">
                     {{ form.new_taxon_parent_id.label(class_="control-label") }}
@@ -241,7 +241,7 @@
                         Name: {{ comp.name }}
                     </h5>
                     <h5>
-                        NPAID: <a href="https://npatlas-dev.chem.sfu.ca/joomla/index.php/explore/compounds#npaid={{ comp.npaid }}" target="_blank">
+                        NPAID: <a href="https://www.npatlas.org/explore/compounds/{{ comp.npaid }}" target="_blank">
                                     {{ comp.npaid }}
                                 </a>
                     </h5>
