@@ -6,6 +6,7 @@ class Compound(BaseModel, extra=Extra.forbid):
     name: str
     smiles: str
     source_organism: Optional[str]
+    npaid: Optional[int]
 
 
 class BaseArticle(BaseModel, extra=Extra.forbid):
