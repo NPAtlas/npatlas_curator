@@ -543,7 +543,7 @@ def get_npa_compounds(compound):
         if res:
             compounds.append(
                 NPACompound(
-                    res.id,
+                    res.get("id"),
                     res.get("original_name"),
                     atlas_api.get_compound_molblock(compound.npaid),
                     res.get("inchikey"),
