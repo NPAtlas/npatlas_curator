@@ -50,11 +50,11 @@ logger = get_task_logger(__name__)
 
 @celery.task(bind=True)
 def start_checker_task(self, dataset_id, standardize_compounds=False, restart=False):
-
+    print(f"STARTING checker for Dataset {dataset_id}")
     checker = Checker(dataset_id, celery_task=self, logger=logger)
     checker.run(standardize_compounds=standardize_compounds, restart=restart)
     result = "/admin/resolve/dataset{}".format(dataset_id)
-
+    print(f"COMPLETED checker for Dataset {dataset_id}")
     return {"current": 100, "total": 100, "status": "Task completed!", "result": result}
 
 
@@ -65,12 +65,15 @@ def standardize_dataset(ds_id):
         dataset.checker_dataset.standardized = False
     commit()
     run_standardization(ds_id)
+    print(f"Completed standardization for Dataset {ds_id}")
 
 
 @celery.task(bind=True)
 def insert_dataset(self, dataset_id):
+    print(f"STARTING insertion of Dataset {dataset_id}")
     inserter = Inserter(dataset_id, celery_task=self, logger=logger)
     result = inserter.run()
+    print(f"COMPLETED insertion of Dataset {dataset_id}")
 
     return {"current": 100, "total": 100, "status": "Task completed!", "result": result}
 
