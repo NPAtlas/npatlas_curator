@@ -393,7 +393,16 @@ def resolve_problem(ds_id, prob_id):
         if form.reject.data:
             article.article.is_nparticle = False
             problem.resolved = True
+            # mark all problems as resolved if rejected
+            other_article_problems = Problem.query.filter(
+                Problem.article_id == problem.article_id
+            ).all()
+            for oprob in other_article_problems:
+                oprob.resolved = True
             commit()
+            # this makes next_problem id unclear to set to None
+            # to redirect to problem_list
+            next_problem_id = None
         else:
             if force:
                 article.resolved = True
