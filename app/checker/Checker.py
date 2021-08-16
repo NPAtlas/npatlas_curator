@@ -164,12 +164,12 @@ class Checker:
                             comp_id=checker_compound.id,
                         )
                     # Impose strict verification for flat matches
-                    else:
-                        self.add_problem(
-                            checker_compound.get_article_id(),
-                            "flat_match",
-                            comp_id=checker_compound.id,
-                        )
+                    # else:
+                    #     self.add_problem(
+                    #         checker_compound.get_article_id(),
+                    #         "flat_match",
+                    #         comp_id=checker_compound.id,
+                    #     )
                 # Check for name match (ignores "Not named")
                 if self.compound_name_match(checker_compound):
                     self.add_problem(
