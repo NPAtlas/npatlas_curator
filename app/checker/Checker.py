@@ -154,6 +154,7 @@ class Checker:
 
             # Branch 2 - potentially new compound
             if not checker_compound.npaid:
+                problem_here = False
                 # Check if structure is a duplicate
                 # First find connectivity matches
                 if self.compound_flat_match(checker_compound):
@@ -163,15 +164,19 @@ class Checker:
                             "duplicate",
                             comp_id=checker_compound.id,
                         )
+                        problem_here = True
                     # Impose strict verification for flat matches
-                    # else:
-                    #     self.add_problem(
-                    #         checker_compound.get_article_id(),
-                    #         "flat_match",
-                    #         comp_id=checker_compound.id,
-                    #     )
+                    # Only if there is a longest substring match
+                    elif self.longest_substring_name_match(checker_compound):
+                        self.add_problem(
+                            checker_compound.get_article_id(),
+                            "flat_match",
+                            comp_id=checker_compound.id,
+                        )
+                        problem_here = True
+
                 # Check for name match (ignores "Not named")
-                if self.compound_name_match(checker_compound):
+                if self.compound_name_match(checker_compound) and not problem_here:
                     self.add_problem(
                         checker_compound.get_article_id(),
                         "name_match",
@@ -442,6 +447,17 @@ class Checker:
         res = None
         if compound.name != "Not named":
             res = atlas_api.search_name(compound.name)
+        return bool(res)
+
+    def longest_substring_name_match(self, compound):
+        res = None
+        struct_inchi = compound.inchikey.split("-")[0]
+        if compound.name != "Not named":
+            longest_substring = next(
+                iter(sorted((compound.name.split()), key=len, reverse=True))
+            )
+            comps = atlas_api.search_name(longest_substring)
+            res = any(struct_inchi in c.get("inchikey", "") for c in comps)
         return bool(res)
 
     def npaid_changed(self, compound):
