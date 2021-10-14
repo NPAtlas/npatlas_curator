@@ -1,0 +1,114 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "http://example.com/schemas/dataset_schema.json",
+  "$comment": "NP Atlas Curator JSON Schema for adding dataset to app",
+  "title": "Dataset",
+  "type": "object",
+  "properties": {
+    "instructions": {
+      "title": "Instructions",
+      "type": "string"
+    },
+    "articles": {
+      "title": "Articles",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Article"
+      }
+    }
+  },
+  "required": [
+    "articles"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "Compound": {
+      "title": "Compound",
+      "type": "object",
+      "properties": {
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "smiles": {
+          "title": "Smiles",
+          "type": "string"
+        },
+        "source_organism": {
+          "title": "Source Organism",
+          "type": "string"
+        },
+        "npaid": {
+          "title": "Npaid",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "name",
+        "smiles"
+      ],
+      "additionalProperties": false
+    },
+    "Article": {
+      "title": "Article",
+      "type": "object",
+      "properties": {
+        "doi": {
+          "title": "Doi",
+          "type": "string"
+        },
+        "pmid": {
+          "title": "Pmid",
+          "type": "integer"
+        },
+        "journal": {
+          "title": "Journal",
+          "type": "string"
+        },
+        "year": {
+          "title": "Year",
+          "type": "string"
+        },
+        "volume": {
+          "title": "Volume",
+          "type": "string"
+        },
+        "issue": {
+          "title": "Issue",
+          "type": "string"
+        },
+        "pages": {
+          "title": "Pages",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "authors": {
+          "title": "Authors",
+          "type": "string"
+        },
+        "abstract": {
+          "title": "Abstract",
+          "type": "string"
+        },
+        "compounds": {
+          "title": "Compounds",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Compound"
+          }
+        },
+        "notes": {
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "compounds"
+      ],
+      "additionalProperties": false
+    }
+  }
+}
