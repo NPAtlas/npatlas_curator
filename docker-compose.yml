@@ -33,7 +33,7 @@ services:
       - NO_PROXY=naturalproductsapi.chem.sfu.ca,127.0.0.0/8,172.24.0.0/8
 
   site:
-    image: ghcr.io/npatlas/atlas_curator:3.3.5
+    image: ghcr.io/npatlas/atlas_curator:3.3.6
     restart: always
     env_file:
       - ./flask.env
@@ -43,7 +43,7 @@ services:
       - traefik.http.routers.curator.tls.certresolver=le
 
   celery:
-    image: ghcr.io/npatlas/atlas_curator:3.3.5
+    image: ghcr.io/npatlas/atlas_curator:3.3.6
     restart: always
     env_file:
       - ./flask.env
