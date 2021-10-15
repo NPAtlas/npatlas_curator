@@ -21,7 +21,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   site:
-    image: registry.jvansan.duckdns.org/atlas_curator:3.3.5
+    image: ghcr.io/npatlas/atlas_curator:3.3.5
     restart: always
     env_file:
       - ./flask.env
@@ -31,30 +31,28 @@ services:
       - ./app:/curator/app
       - ./migrations:/curator/migrations
       - ./tests:/curator/tests
+    depends_on:
+      - mysql
+      - redis
     command:
       [
-        /opt/conda/bin/conda,
-        run,
-        --no-capture-output,
-        -n,
-        curator,
         flask,
         run,
         --host=0.0.0.0,
       ]
 
   celery:
-    image: registry.jvansan.duckdns.org/atlas_curator:3.3.5
+    image: ghcr.io/npatlas/atlas_curator:3.3.5
     restart: always
     env_file:
       - ./flask.env
+    volumes:
+      - ./app:/curator/app
+    depends_on:
+      - mysql
+      - redis
     command:
       [
-        /opt/conda/bin/conda,
-        run,
-        --no-capture-output,
-        -n,
-        curator,
         celery,
         -A,
         celery_worker.celery,
@@ -67,12 +65,15 @@ services:
     image: redis
     restart: always
     volumes:
-      - $HOME/docker_volumes/redis:/data
+      - redisdata:/data
+    ports:
+      - 6379:6379
     command: ["redis-server", "--appendonly", "yes"]
 
   mysql:
     image: mysql:5.7
     restart: always
+  # Dont expose ports - no auth
     env_file:
       - mysql.env
     command:
@@ -82,7 +83,40 @@ services:
         "--collation-server=utf8mb4_unicode_ci",
       ]
     volumes:
-      - $HOME/docker_volumes/mysql:/var/lib/mysql
+      - mysqldata:/var/lib/mysql
     ports:
       # The HTTP port
       - "3306:3306"
+
+  # These are useful for a sandbox version with NP ATLAS DEV API
+  api:
+    image: ghcr.io/npatlas/npatlas_api:0.1.4
+    restart: always
+    env_file:
+      - api.env
+    labels:
+      - traefik.http.routers.atlas-api.rule=PathPrefix(`/api/v1`)
+    command:
+      - "/start-reload.sh"
+    depends_on:
+      - atlasdb
+      - redis
+
+  atlasdb:
+    image: mcs07/postgres-rdkit
+    restart: always
+    env_file:
+      - psql.env
+    volumes:
+      - psqldata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+# These external volumes are for persistent data
+volumes:
+  psqldata:
+    external: true
+  mysqldata:
+    external: true
+  redisdata:
+    external: true

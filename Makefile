@@ -1,15 +1,17 @@
 NAME := atlas_curator
 # VERSION := $(shell git describe --tags)
 VERSION := 3.3.5
-REGISTRY := registry.jvansan.duckdns.org
+REGISTRY := ghcr.io/npatlas
 
-all: build-docker push
+all: build-docker tag push
 
 build-docker:
 	docker build -t $(NAME):$(VERSION) .
 
-push:
+tag:
 	docker tag $(NAME):$(VERSION) $(REGISTRY)/$(NAME):$(VERSION)
+
+push:
 	docker push $(REGISTRY)/$(NAME):$(VERSION)
 
 dev:

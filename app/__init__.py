@@ -58,6 +58,10 @@ def create_app(config_name="default"):
     from .checker import checker as checker_blueprint
 
     app.register_blueprint(checker_blueprint)
+    from .cli import usersbp
+
+    app.register_blueprint(usersbp)
+
 
     @app.before_first_request
     def setup_logging():

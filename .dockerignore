@@ -13,3 +13,4 @@ LICENSE
 .vscode
 mysql-dumps/
 data/
+docker_volumes/
