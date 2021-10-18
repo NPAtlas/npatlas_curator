@@ -49,11 +49,6 @@ services:
       - ./flask.env
     command:
       [
-        /opt/conda/bin/conda,
-        run,
-        --no-capture-output,
-        -n,
-        curator,
         celery,
         -A,
         celery_worker.celery,
