@@ -124,7 +124,7 @@ I have created a convenience CLI in the Flask App for creating users, including 
 
 ```bash
 # setup the flask DB tables for the first time
-docker-compose -f docker-compose.dev.yml exec flask db upgrade
+docker-compose -f docker-compose.dev.yml exec site flask db upgrade
 # create admin user for curator app
 docker-compose -f docker-compose.dev.yml exec site flask users create --username admin --password admin --email test@test.com --admin
 ```
