@@ -1,6 +1,6 @@
 # NP Atlas Curator WEB APP EDITION
 
-_Version 3.3.7_
+_Version 3.3.7a_
 
 
 ### Deployment
