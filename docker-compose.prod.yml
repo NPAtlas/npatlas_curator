@@ -54,7 +54,6 @@ services:
         celery_worker.celery,
         worker,
         --loglevel=INFO,
-        --uid=uwsgi,
       ]
 
   redis:

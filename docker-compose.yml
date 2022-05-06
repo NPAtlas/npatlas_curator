@@ -28,9 +28,9 @@ services:
     labels:
       - traefik.http.routers.curator.rule=PathPrefix(`/`)
     volumes:
-      - ./app:/curator/app
-      - ./migrations:/curator/migrations
-      - ./tests:/curator/tests
+      - ./app:/home/flask/app/app
+      - ./migrations:/home/flask/app/migrations
+      - ./tests:/home/flask/app/tests
     depends_on:
       - mysql
       - redis
@@ -47,7 +47,7 @@ services:
     env_file:
       - ./flask.env
     volumes:
-      - ./app:/curator/app
+      - ./app:/home/flask/app/app/
     depends_on:
       - mysql
       - redis
@@ -58,7 +58,6 @@ services:
         celery_worker.celery,
         worker,
         --loglevel=INFO,
-        --uid=uwsgi,
       ]
 
   redis:
