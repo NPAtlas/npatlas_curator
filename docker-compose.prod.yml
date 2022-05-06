@@ -1,0 +1,79 @@
+version: "3"
+
+services:
+  traefik:
+    image: traefik:2.2
+    restart: always
+    command:
+      --api.insecure=true
+      --providers.docker
+      --entryPoints.web.address=:80
+      --entryPoints.websecure.address=:443
+      --certificatesResolvers.le.acme.email=jvansant@sfu.ca
+      --certificatesResolvers.le.acme.storage=/acme/acme.json
+      --certificatesResolvers.le.acme.tlsChallenge=true
+      --entrypoints.web.http.redirections.entryPoint.to=websecure
+      --entrypoints.web.http.redirections.entryPoint.scheme=https
+      # --certificatesResolvers.le.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory
+      # --log.level=DEBUG
+    ports:
+      # The HTTP port
+      - "80:80"
+      # The HTTPS port
+      - "443:443"
+        # The Web UI enabled by --api.insecure=true
+      - "8080:8080"
+    volumes:
+      # So that Traefik can listen to the Docker events
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "./docker_volumes/acme/:/acme/"
+    environment:
+      - HTTP_PROXY=http://bby-nsx-proxy.its.sfu.ca:8080
+      - HTTPS_PROXY=http://bby-nsx-proxy.its.sfu.ca:8080
+      - NO_PROXY=naturalproductsapi.chem.sfu.ca,127.0.0.0/8,172.24.0.0/8
+
+  site:
+    image: ghcr.io/npatlas/atlas_curator:3.3.6
+    restart: always
+    env_file:
+      - ./flask.env
+    labels:
+      - traefik.http.routers.curator.rule=Host(`curator.npatlas.org`)
+      - traefik.http.routers.curator.tls=true
+      - traefik.http.routers.curator.tls.certresolver=le
+
+  celery:
+    image: ghcr.io/npatlas/atlas_curator:3.3.6
+    restart: always
+    env_file:
+      - ./flask.env
+    command:
+      [
+        celery,
+        -A,
+        celery_worker.celery,
+        worker,
+        --loglevel=INFO,
+        --uid=uwsgi,
+      ]
+
+  redis:
+    image: redis
+    restart: always
+    volumes:
+      - $HOME/docker_volumes/redis:/data
+    command: ["redis-server", "--appendonly", "yes"]
+
+  mysql:
+    image: mysql:5.7
+    restart: always
+    env_file:
+      - mysql.env
+    command:
+      [
+        "mysqld",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+      ]
+    volumes:
+      - $HOME/docker_volumes/mysql:/var/lib/mysql
