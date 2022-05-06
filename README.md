@@ -1,6 +1,6 @@
 # NP Atlas Curator WEB APP EDITION
 
-_Version 3.3.6_
+_Version 3.3.7_
 
 
 ### Deployment
@@ -109,7 +109,7 @@ docker volume create redisdata
 **Third**, you can now spin up your development docker containers:
 
 ```bash
-docker-compose -f docker-compose.dev.yml up -d
+docker-compose up -d
 ```
 
 If you go to http://localhost you should see the NP Atlas Curator home page.
@@ -124,9 +124,9 @@ I have created a convenience CLI in the Flask App for creating users, including 
 
 ```bash
 # setup the flask DB tables for the first time
-docker-compose -f docker-compose.dev.yml exec site flask db upgrade
+docker-compose exec site flask db upgrade
 # create admin user for curator app
-docker-compose -f docker-compose.dev.yml exec site flask users create --username admin --password admin --email test@test.com --admin
+docker-compose exec site flask users create --username admin --password admin --email test@test.com --admin
 ```
 
 2. NP Atlas API
@@ -138,14 +138,14 @@ Make sure you have a SQL dump loaded into the `./data` directory.
 
 ```bash
 # setup npatlas database
-docker-compose -f docker-compose.dev.yml exec atlasdb psql -U npatlas -c 'create database np_atlas_dev' 
-docker-compose -f docker-compose.dev.yml exec -T atlasdb psql -d np_atlas_dev -U npatlas < ./data/npatlas_dev.psql
-docker-compose -f docker-compose.dev.yml exec atlasdb psql -U npatlas -c 'alter database np_atlas_dev set search_path to np_atlas,rdk,public;'
+docker-compose exec atlasdb psql -U npatlas -c 'create database np_atlas_dev' 
+docker-compose exec -T atlasdb psql -d np_atlas_dev -U npatlas < ./data/npatlas_dev.psql
+docker-compose exec atlasdb psql -U npatlas -c 'alter database np_atlas_dev set search_path to np_atlas,rdk,public;'
 # setup authentication database
-docker-compose -f docker-compose.dev.yml exec atlasdb psql -U npatlas -c 'create database authentication'
+docker-compose exec atlasdb psql -U npatlas -c 'create database authentication'
 # last step here would be to add admin user, but I'm going to skip this as it's a bunch of extra work...
 # setup apikey
-docker-compose -f docker-compose.dev.yml exec redis redis-cli -n 0 SET ATLAS_APIKEY 0
+docker-compose exec redis redis-cli -n 0 SET ATLAS_APIKEY 0
 # restart all the services to make sure things load properly
-docker-compose -f docker-compose.dev.yml restart
+docker-compose restart
 ```

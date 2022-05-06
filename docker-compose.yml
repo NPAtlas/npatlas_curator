@@ -21,7 +21,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   site:
-    image: ghcr.io/npatlas/atlas_curator:3.3.6
+    image: ghcr.io/npatlas/atlas_curator:3.3.7
     restart: always
     env_file:
       - ./flask.env
@@ -42,7 +42,7 @@ services:
       ]
 
   celery:
-    image: ghcr.io/npatlas/atlas_curator:3.3.6
+    image: ghcr.io/npatlas/atlas_curator:3.3.7
     restart: always
     env_file:
       - ./flask.env
