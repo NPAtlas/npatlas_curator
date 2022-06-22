@@ -261,6 +261,7 @@ def edit_dataset(id):
     dataset = Dataset.query.get_or_404(id)
     curators = Curator.query.order_by("id").all()
     form = DatasetForm(obj=dataset)
+    form.curator_id.choices = [(c.id, c.full_name) for c in curators]
 
     if form.validate_on_submit():
         dataset.curator_id = form.curator_id.data
@@ -274,7 +275,6 @@ def edit_dataset(id):
 
         return redirect(url_for("admin.list_datasets"))
 
-    form.curator_id.choices = [(c.id, c.full_name) for c in curators]
     form.instructions.data = dataset.instructions
 
     return render_template("admin/edit_dataset.html", form=form)
