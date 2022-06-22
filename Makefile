@@ -1,6 +1,6 @@
 NAME := atlas_curator
 # VERSION := $(shell git describe --tags)
-VERSION := 3.3.7a
+VERSION := 3.3.8
 REGISTRY := ghcr.io/npatlas
 
 all: build-docker tag push
