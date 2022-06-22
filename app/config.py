@@ -45,9 +45,10 @@ app_config = {
 DBSERVER = os.getenv("DBSERVER", "127.0.0.1")
 DBUSER = os.getenv("DBUSER", "jvansan")
 DBPASSWORD = os.getenv("DBPASSWORD", "jvansan")
+DBPORT = os.getenv("DBPORT", "3306")
 SECRET_KEY = os.urandom(24)
 SQLALCHEMY_DATABASE_URI = (
-    f"mysql+pymysql://{DBUSER}:{DBPASSWORD}@{DBSERVER}:3306/npatlas_curation"
+    f"mysql+pymysql://{DBUSER}:{DBPASSWORD}@{DBSERVER}:{DBPORT``}/npatlas_curation"
 )
 REDISSERVER = os.getenv("REDIS", "127.0.0.1")
 REDIS_DATABASE_URI = "redis://{}:6379".format(REDISSERVER)
