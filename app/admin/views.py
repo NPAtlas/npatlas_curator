@@ -42,7 +42,9 @@ def list_datasets():
     # Get page
     page = request.args.get("page", 1, type=int)
 
-    datasets = Dataset.query.order_by(Dataset.id.desc()).paginate(page, 10, False)
+    datasets = Dataset.query.order_by(Dataset.id.desc()).paginate(
+        page=page, per_page=10, error_out=False
+    )
 
     next_url = (
         url_for("admin.list_datasets", page=datasets.next_num)
@@ -72,7 +74,7 @@ def list_articles():
     List all articles
     """
     page = request.args.get("page", 1, type=int)
-    articles = Article.query.paginate(page, 10, False)
+    articles = Article.query.paginate(page=page, per_page=10, error_out=False)
 
     next_url = (
         url_for("admin.list_articles", page=articles.next_num)
