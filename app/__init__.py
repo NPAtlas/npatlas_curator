@@ -61,7 +61,9 @@ def create_app(config_name="default"):
     from .cli import usersbp
 
     app.register_blueprint(usersbp)
+    from .cli.dataset import datasetbp
 
+    app.register_blueprint(datasetbp)
 
     @app.before_first_request
     def setup_logging():
