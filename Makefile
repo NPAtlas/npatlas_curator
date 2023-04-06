@@ -1,6 +1,5 @@
 NAME := atlas_curator
-# VERSION := $(shell git describe --tags)
-VERSION := 3.3.8
+VERSION := $(shell poetry version --short)
 REGISTRY := ghcr.io/npatlas
 
 all: build-docker tag push
@@ -19,3 +18,12 @@ dev:
 
 echo-name:
 	echo $(REGISTRY)/$(NAME):$(VERSION)
+
+poetryversion:
+	poetry version $(version) 
+	
+# Use like `make version=VERSION version`
+version: poetryversion
+	$(eval NEW_VERS := $(shell cat pyproject.toml | grep "^version = \"*\"" | cut -d'"' -f2))
+	sed -i "s/__version__ = .*/__version__ = \"$(NEW_VERS)\"/g" app/__init__.py
+	sed -i "s|$(REGISTRY)/$(NAME)\:.*|$(REGISTRY)/$(NAME):$(NEW_VERS)|g" docker-compose.yml docker-compose.prod.yml
