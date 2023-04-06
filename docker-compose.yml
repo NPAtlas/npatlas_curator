@@ -21,7 +21,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   site:
-    image: ghcr.io/npatlas/atlas_curator:3.3.7a
+    image: ghcr.io/npatlas/atlas_curator:3.3.8
     restart: always
     env_file:
       - ./flask.env
@@ -42,7 +42,7 @@ services:
       ]
 
   celery:
-    image: ghcr.io/npatlas/atlas_curator:3.3.7a
+    image: ghcr.io/npatlas/atlas_curator:3.3.8
     restart: always
     env_file:
       - ./flask.env
@@ -60,6 +60,7 @@ services:
         --loglevel=INFO,
       ]
 
+  # Dont expose ports in prod - no auth 
   redis:
     image: redis
     restart: always
@@ -72,49 +73,47 @@ services:
   mysql:
     image: mariadb:10-jammy
     restart: always
-  # Dont expose ports - no auth
     env_file:
       - mysql.env
-    # command:
-    #   [
-    #     "mysqld",
-    #     "--character-set-server=utf8mb4",
-    #     "--collation-server=utf8mb4_unicode_ci",
-    #   ]
+    command:
+      [
+        "mysqld",
+        "--character-set-server=utf8mb4",
+        "--collation-server=utf8mb4_unicode_ci",
+      ]
     volumes:
       - mysqldata:/var/lib/mysql
     ports:
-      # The HTTP port
       - "3306:3306"
 
   # These are useful for a sandbox version with NP ATLAS DEV API
-  # api:
-  #   image: ghcr.io/npatlas/npatlas_api:0.1.4
-  #   restart: always
-  #   env_file:
-  #     - api.env
-  #   labels:
-  #     - traefik.http.routers.atlas-api.rule=PathPrefix(`/api/v1`)
-  #   command:
-  #     - "/start-reload.sh"
-  #   depends_on:
-  #     - atlasdb
-  #     - redis
+  api:
+    image: ghcr.io/npatlas/npatlas_api:0.1.4
+    restart: always
+    env_file:
+      - api.env
+    labels:
+      - traefik.http.routers.atlas-api.rule=PathPrefix(`/api/v1`)
+    command:
+      - "/start-reload.sh"
+    depends_on:
+      - atlasdb
+      - redis
 
-  # atlasdb:
-  #   image: mcs07/postgres-rdkit
-  #   restart: always
-  #   env_file:
-  #     - psql.env
-  #   volumes:
-  #     - psqldata:/var/lib/postgresql/data
-  #   ports:
-  #     - 5432:5432
+  atlasdb:
+    image: mcs07/postgres-rdkit
+    restart: always
+    env_file:
+      - psql.env
+    volumes:
+      - psqldata:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
 
 # These external volumes are for persistent data
 volumes:
-  # psqldata:
-  #   external: true
+  psqldata:
+    external: true
   mysqldata:
     external: true
   redisdata:

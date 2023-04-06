@@ -1,9 +1,9 @@
-FROM python:3.8-bullseye
+FROM python:3.10-bullseye
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    POETRY_VERSION=1.1.13 \
+    POETRY_VERSION=1.4.0 \
     PATH="/root/.local/bin:${PATH}" \
     FLASK_APP="run.py" \
     FLASK_CONFIG=production \
@@ -25,8 +25,7 @@ RUN mkdir /home/flask/app
 WORKDIR /home/flask/app
 COPY poetry.lock pyproject.toml ./
 RUN  poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi \
-    && pip install gunicorn
+    && poetry install --no-interaction --no-ansi --without dev
 
 USER flask
 

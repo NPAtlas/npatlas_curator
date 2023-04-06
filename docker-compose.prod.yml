@@ -32,29 +32,29 @@ services:
       - HTTPS_PROXY=http://bby-nsx-proxy.its.sfu.ca:8080
       - NO_PROXY=naturalproductsapi.chem.sfu.ca,127.0.0.0/8,172.24.0.0/8
 
-  site:
-    image: ghcr.io/npatlas/atlas_curator:3.3.7a
-    restart: always
-    env_file:
-      - ./flask.env
-    labels:
-      - traefik.http.routers.curator.rule=Host(`curator.npatlas.org`)
-      - traefik.http.routers.curator.tls=true
-      - traefik.http.routers.curator.tls.certresolver=le
+    site:
+      image: ghcr.io/npatlas/atlas_curator:3.3.8
+      restart: always
+      env_file:
+        - ./flask.env
+      labels:
+        - traefik.http.routers.curator.rule=Host(`curator.npatlas.org`)
+        - traefik.http.routers.curator.tls=true
+        - traefik.http.routers.curator.tls.certresolver=le
+      environment:
+        - HTTP_PROXY=http://bby-nsx-proxy.its.sfu.ca:8080
+        - NO_PROXY=127.0.0.0/8,172.24.0.0/8,api.npatlas.org
+
 
   celery:
-    image: ghcr.io/npatlas/atlas_curator:3.3.7a
+    image: ghcr.io/npatlas/atlas_curator:3.3.8
     restart: always
     env_file:
       - ./flask.env
-    command:
-      [
-        celery,
-        -A,
-        celery_worker.celery,
-        worker,
-        --loglevel=INFO,
-      ]
+    command: [celery, -A, celery_worker.celery, worker, --loglevel=INFO]
+    environment:
+      - HTTP_PROXY=http://bby-nsx-proxy.its.sfu.ca:8080
+      - NO_PROXY=127.0.0.0/8,172.24.0.0/8,api.npatlas.org
 
   redis:
     image: redis
@@ -68,11 +68,6 @@ services:
     restart: always
     env_file:
       - mysql.env
-    command:
-      [
-        "mysqld",
-        "--character-set-server=utf8mb4",
-        "--collation-server=utf8mb4_unicode_ci",
-      ]
+    command: ['mysqld', '--character-set-server=utf8mb4', '--collation-server=utf8mb4_unicode_ci']
     volumes:
       - $HOME/docker_volumes/mysql:/var/lib/mysql
