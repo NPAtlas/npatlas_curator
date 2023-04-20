@@ -10,12 +10,12 @@ from rdkit.Chem.AllChem import ReplaceSubstructs
 # Silence RDKit Warning
 from rdkit import rdBase
 
-rdBase.DisableLog("rdApp.warning")
 from requests.exceptions import RequestException
 
 from .timeout import exit_after
 from .pubchem_smiles_standardizer import get_standardized_smiles
 
+rdBase.DisableLog("rdApp.warning")
 
 class Compound(object):
     def __init__(self, smiles, **kwargs):

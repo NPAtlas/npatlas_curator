@@ -1,6 +1,5 @@
 import click
 from flask import Blueprint
-from sqlalchemy import exc
 from .. import db
 from ..models import Curator
 

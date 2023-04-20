@@ -15,11 +15,10 @@ from flask import (
 )
 from flask_login import current_user, login_required
 from rdkit.Chem import AllChem as Chem
-from requests.exceptions import RequestException
 
 from . import data
-from .. import celery, db
-from ..models import Article, Compound, Curator, Dataset, dataset_article
+from .. import db
+from ..models import Article, Compound, Curator, Dataset
 from ..utils.NoneDict import NoneDict
 from ..utils import slack_notifier
 from .forms import ArticleForm
@@ -509,7 +508,7 @@ def try_dbcommit():
     try:
         db.session.commit()
         # flash('Data saved!')
-    except:
+    except Exception:
         db.session.rollback()
         flash("Error sending data to database... Please contact us!")
 

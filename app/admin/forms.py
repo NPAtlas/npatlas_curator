@@ -1,8 +1,6 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
-
-from ..models import Curator
+from wtforms.validators import DataRequired, Email, EqualTo
 
 
 class CuratorForm(FlaskForm):
@@ -19,14 +17,6 @@ class CuratorForm(FlaskForm):
     )
     confirm_password = StringField("Confirm Password")
     submit = SubmitField("Submit Curator")
-
-    # def validate_email(self, field):
-    #     if Curator.query.filter_by(email=field.data).first():
-    #         raise ValidationError('Email is already in use.')
-
-    # def validate_user(self, field):
-    #     if Curator.query.filter_by(username=field.data).first():
-    #         raise ValidationError('Username is already in use.')
 
 
 class DatasetForm(FlaskForm):

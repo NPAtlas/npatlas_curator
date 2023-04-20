@@ -3,7 +3,6 @@ from wtforms import (
     BooleanField,
     HiddenField,
     IntegerField,
-    RadioField,
     SelectField,
     StringField,
     SubmitField,
@@ -12,7 +11,6 @@ from wtforms.validators import DataRequired, Optional
 
 from .schemas import TaxonRanks
 from .validators import (
-    NpaIdValidator,
     SimpleValidator,
     RankSelectValidator,
     DBSelectValidator,

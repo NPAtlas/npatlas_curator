@@ -188,7 +188,7 @@ def startchecker(dataset_id):
 
     try:
         db.session.commit()
-    except:
+    except Exception:
         db.session.rollback()
         flash("Error: database could not be reached")
         abort(400)
@@ -423,7 +423,7 @@ def resolve_problem(ds_id, prob_id):
             #                            problem=problem, article=article, form=form,
             #                            compound=compound, cur_id=cur_id,
             #                            npa_compounds=npa_compounds)
-            # except:
+            # except Exception:
             #     flash("Unknown error...")
             #     # abort(500)
 
@@ -744,7 +744,7 @@ def run_standardization(dataset_id):
     dataset.checker_dataset.standardized = True
     try:
         commit()
-    except:
+    except Exception:
         flash("Could not reach database!")
         abort(500)
 

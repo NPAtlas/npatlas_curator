@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import List
 
 from app import db
 from app.checker.NameString import NameString, decapitalize_first
@@ -8,7 +7,6 @@ from app.checker.ResolveEnum import ResolveEnum
 from app.models import (
     CheckerArticle,
     CheckerCompound,
-    CheckerDataset,
     Dataset,
     Journal,
     Problem,
@@ -337,7 +335,7 @@ class Checker:
         if journal:
             checker_article.journal = journal.journal
             checker_article.journal_abbrev = journal.abbrev
-            if not journal.journal in self.atlas_journals:
+            if journal.journal not in self.atlas_journals:
                 self.add_problem(checker_article.id, "missing_journal")
         else:
             self.add_problem(checker_article.id, "journal")
