@@ -1,7 +1,8 @@
-from flask import request, url_for, redirect
+from urllib.parse import urljoin, urlparse
+
+from flask import redirect, request, url_for
 from flask_wtf import FlaskForm
-from urllib.parse import urlparse, urljoin
-from wtforms import StringField, PasswordField, SubmitField, HiddenField
+from wtforms import HiddenField, PasswordField, StringField, SubmitField
 from wtforms.validators import DataRequired
 
 
@@ -42,4 +43,3 @@ class LoginForm(RedirectForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Login")
-

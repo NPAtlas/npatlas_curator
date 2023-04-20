@@ -1,9 +1,9 @@
 """Allow removing datasets from the database."""
 import click
 from flask import Blueprint
+
 from .. import db
 from ..models import Dataset
-
 
 datasetbp = Blueprint("dataset", __name__)
 

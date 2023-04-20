@@ -4,7 +4,6 @@ import time
 import requests
 from rdkit import Chem
 
-
 """
 PubChem Smiles Standardization:
 author: Jeff van Santen
@@ -124,18 +123,18 @@ urlSend = "https://pubchem.ncbi.nlm.nih.gov/pug/pug.cgi"
 
 def get_PCT_reqid(request_text):
     reqid = None
-    for l in request_text.split("\n"):
-        if "<PCT-Waiting_reqid>" in l:
-            reqid = re.sub("</?PCT-Waiting_reqid>", "", l).strip()
+    for line in request_text.split("\n"):
+        if "<PCT-Waiting_reqid>" in line:
+            reqid = re.sub("</?PCT-Waiting_reqid>", "", line).strip()
             break
     return reqid
 
 
 def check_PCT_status(request_text):
-    for l in request_text.split("\n"):
-        if "<PCT-Status value=" in l:
+    for line in request_text.split("\n"):
+        if "<PCT-Status value=" in line:
             try:
-                code = re.search('<PCT-Status value="([a-z]{4,})"/>', l).group(1)
+                code = re.search('<PCT-Status value="([a-z]{4,})"/>', line).group(1)
             except AttributeError:
                 code = "none"
             break
@@ -144,10 +143,10 @@ def check_PCT_status(request_text):
 
 def get_PCT_smiles(request_text):
     smiles = None
-    for l in request_text.split("\n"):
-        if "<PCT-Structure_structure_string>" in l:
+    for line in request_text.split("\n"):
+        if "<PCT-Structure_structure_string>" in line:
             smiles = (
-                re.sub("</?PCT-Structure_structure_string>", "", l)
+                re.sub("</?PCT-Structure_structure_string>", "", line)
                 .strip()
                 .replace("&#xa;", "")
             )

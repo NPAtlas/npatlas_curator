@@ -1,4 +1,5 @@
 from os import getenv
+
 import requests
 
 WEBHOOK_URL = getenv("SLACK_WEBHOOK_URL")

@@ -8,7 +8,8 @@ class Config(object):
 
     DEBUG = True
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    REMEMBER_COOKIE_DURATION = 604800 # seven days
+    REMEMBER_COOKIE_DURATION = 604800  # seven days
+
 
 class DevelopmentConfig(Config):
     """
@@ -17,7 +18,6 @@ class DevelopmentConfig(Config):
 
     # SQLALCHEMY_ECHO = True
     # LOGIN_DISABLED = True
-    
 
 
 class ProductionConfig(Config):
@@ -27,13 +27,15 @@ class ProductionConfig(Config):
 
     DEBUG = False
 
+
 class TestingConfig(Config):
     """
     Testing configurations
     """
 
     TESTING = True
-    REMEMBER_COOKIE_DURATION = 0 
+    REMEMBER_COOKIE_DURATION = 0
+
 
 app_config = {
     "default": DevelopmentConfig,

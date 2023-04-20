@@ -1,4 +1,3 @@
-from app import data
 import json
 from functools import wraps
 from pathlib import Path
@@ -138,7 +137,7 @@ def article(id):
         try:
             db.session.commit()
             flash("Data saved!")
-        except:
+        except Exception:
             db.session.rollback()
             flash("Error sending data to database...")
 
@@ -194,7 +193,7 @@ def add_curator():
                     form.password.data
                 )
             )
-        except:
+        except Exception:
             db.session.rollback()
             flash("Error: Curator already exists")
 
@@ -233,7 +232,7 @@ def edit_curator(id):
                     form.password.data
                 )
             )
-        except:
+        except Exception:
             db.session.rollback()
             flash("Error: Curator data could not be edited.")
 
@@ -271,7 +270,7 @@ def edit_dataset(id):
         try:
             db.session.commit()
             flash("You have successfully editted the Dataset")
-        except:
+        except Exception:
             db.session.rollback()
             flash("Error: could not edit Dataset")
 

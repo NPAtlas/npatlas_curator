@@ -1,8 +1,7 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, SelectField
-from wtforms.validators import DataRequired, Email, EqualTo, ValidationError
+from wtforms import SelectField, StringField, SubmitField
+from wtforms.validators import DataRequired, Email, EqualTo
 
-from ..models import Curator
 
 
 class CuratorForm(FlaskForm):

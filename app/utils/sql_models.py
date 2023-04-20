@@ -10,7 +10,6 @@ from sqlalchemy import (
     DateTime,
     ForeignKey,
     Integer,
-    Numeric,
     String,
     Table,
     Text,
@@ -124,7 +123,6 @@ class Compound(Base):
 
 # ORM Interface
 class CuratorDB(object):
-
     # Bind tables to access layer
     Base = Base
     metadata = Base.metadata

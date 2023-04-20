@@ -1,9 +1,9 @@
-from flask import flash, redirect, render_template, url_for, request, abort
+from urllib.parse import urljoin, urlparse
+from flask import flash, redirect, render_template, request, url_for
 from flask_login import login_required, login_user, logout_user
 
-from . import auth
-from .. import db
 from ..models import Curator
+from . import auth
 from .forms import LoginForm
 
 

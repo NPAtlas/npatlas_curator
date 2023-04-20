@@ -1,5 +1,7 @@
 import re
+
 from wtforms.validators import ValidationError
+
 
 # Custom Validators
 class ValidateYear(object):

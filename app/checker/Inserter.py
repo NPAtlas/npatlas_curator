@@ -1,6 +1,6 @@
-import logging
 import json
-from dataclasses import dataclass, asdict
+import logging
+from dataclasses import asdict, dataclass
 from enum import Enum
 from typing import Dict, List
 from urllib.parse import quote

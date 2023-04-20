@@ -2,26 +2,16 @@ import json
 import os
 from collections import Counter
 
-from flask import (
-    abort,
-    current_app,
-    flash,
-    jsonify,
-    redirect,
-    render_template,
-    request,
-    session,
-    url_for,
-)
+from flask import (abort, current_app, flash, jsonify, redirect,
+                   render_template, request, session, url_for)
 from flask_login import current_user, login_required
 from rdkit.Chem import AllChem as Chem
-from requests.exceptions import RequestException
 
-from . import data
-from .. import celery, db
-from ..models import Article, Compound, Curator, Dataset, dataset_article
-from ..utils.NoneDict import NoneDict
+from .. import db
+from ..models import Article, Compound, Curator, Dataset
 from ..utils import slack_notifier
+from ..utils.NoneDict import NoneDict
+from . import data
 from .forms import ArticleForm
 
 slack_notify = os.getenv("SLACK_WEBHOOK_URL")
