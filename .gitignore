@@ -7,7 +7,7 @@ instance/
 
 mysql-dumps/
 dh-params/
-data/
+./data/
 docker_volumes/
 *.env
 
