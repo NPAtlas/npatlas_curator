@@ -189,7 +189,7 @@ def dataset(cur_id, ds_id):
     if dataset.curator_id != current_user.id and not current_user.is_admin:
         abort(403)
 
-    articles = dataset.get_articles().paginate(page, 10, False)
+    articles = dataset.get_articles().paginate(page=page, per_page=10, error_out=False)
 
     next_url = (
         url_for("data.dataset", page=articles.next_num, cur_id=cur_id, ds_id=ds_id)
