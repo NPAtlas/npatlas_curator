@@ -1,5 +1,6 @@
 import logging
 import re
+from typing import List
 
 from app import db
 from app.checker.NameString import NameString, decapitalize_first
@@ -7,6 +8,7 @@ from app.checker.ResolveEnum import ResolveEnum
 from app.models import (
     CheckerArticle,
     CheckerCompound,
+    CheckerDataset,
     Dataset,
     Journal,
     Problem,
@@ -49,6 +51,7 @@ class Checker:
         total = len(dataset.articles)
 
         for i, article in enumerate(dataset.get_articles()):
+
             # Safely skip over previously retracted articles
             if self.check_reject_article(article):
                 article.is_nparticle = False
@@ -334,7 +337,7 @@ class Checker:
         if journal:
             checker_article.journal = journal.journal
             checker_article.journal_abbrev = journal.abbrev
-            if journal.journal not in self.atlas_journals:
+            if not journal.journal in self.atlas_journals:
                 self.add_problem(checker_article.id, "missing_journal")
         else:
             self.add_problem(checker_article.id, "journal")
@@ -364,7 +367,7 @@ class Checker:
         # Watchout for en dash and em dash
         pages = checker_article.pages
         if pages:
-            pages = re.sub("\u2013|\u2014", "-", pages)
+            pages = re.sub(u"\u2013|\u2014", "-", pages)
             if re.search("^[0-9]", pages):
                 res = [x.strip() for x in pages.split("-") if x]
                 res = clean_num_pages(res)

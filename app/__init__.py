@@ -37,10 +37,11 @@ def create_app(config_name="default"):
     login_manager.init_app(app)
     login_manager.login_message = "You must login to access this page."
     login_manager.login_view = "auth.login"
-    Migrate(app, db)
+    migrate = Migrate(app, db)
     celery.conf.update(app.config)
     cache.init_app(app)
 
+    from app import models
 
     from .auth import auth as auth_blueprint
 

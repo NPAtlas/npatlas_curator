@@ -16,13 +16,13 @@ from app import cache, celery, config, db
 from app.admin.views import require_admin
 from app.models import (
     AltJournal,
+    Taxon,
     CheckerArticle,
     CheckerCompound,
     CheckerDataset,
     Dataset,
     Journal,
     Problem,
-    Taxon,
 )
 from app.utils import atlas_api, oauth_session
 from app.utils.pubchem_smiles_standardizer import get_standardized_smiles
@@ -188,7 +188,7 @@ def startchecker(dataset_id):
 
     try:
         db.session.commit()
-    except Exception:
+    except:
         db.session.rollback()
         flash("Error: database could not be reached")
         abort(400)
@@ -341,6 +341,7 @@ def taxon_autocomplete():
 @login_required
 @require_admin
 def resolve_problem(ds_id, prob_id):
+
     # Get all the necessary data from the database
     problem = Problem.query.get_or_404(prob_id)
     article = CheckerArticle.query.get_or_404(problem.article_id)
@@ -743,7 +744,7 @@ def run_standardization(dataset_id):
     dataset.checker_dataset.standardized = True
     try:
         commit()
-    except Exception:
+    except:
         flash("Could not reach database!")
         abort(500)
 

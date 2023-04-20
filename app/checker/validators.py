@@ -9,7 +9,7 @@ class SimpleValidator(object):
 
     def __call__(self, form, field):
         type_ = form["type_"].data
-        self.message = "{}: {} -- Format incorrect".format(type_, field.data)
+        self.message = u"{}: {} -- Format incorrect".format(type_, field.data)
         if type_ == "year":
             try:
                 year = int(field.data)
@@ -19,7 +19,7 @@ class SimpleValidator(object):
                 raise ValidationError(self.message)
         elif type_ == "pmid":
             try:
-                int(field.data)
+                pmid = int(field.data)
             except TypeError:
                 raise ValidationError(self.message)
         elif type_ == "doi":

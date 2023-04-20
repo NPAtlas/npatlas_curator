@@ -3,30 +3,31 @@
 """
 import copy
 import logging
+from rdkit import Chem
+from rdkit.Chem import rdMolDescriptors, rdDepictor, Descriptors, SaltRemover
+from rdkit.Chem.AllChem import ReplaceSubstructs
 
 # Silence RDKit Warning
-from rdkit import Chem, rdBase
-from rdkit.Chem import Descriptors, SaltRemover, rdDepictor, rdMolDescriptors
-from rdkit.Chem.AllChem import ReplaceSubstructs
-from requests.exceptions import RequestException
-
-from .pubchem_smiles_standardizer import get_standardized_smiles
-from .timeout import exit_after
+from rdkit import rdBase
 
 rdBase.DisableLog("rdApp.warning")
+from requests.exceptions import RequestException
+
+from .timeout import exit_after
+from .pubchem_smiles_standardizer import get_standardized_smiles
 
 
 class Compound(object):
     def __init__(self, smiles, **kwargs):
         """Initialize Compound object
 
-        :smiles (str) - Input smiles string for compound object
+            :smiles (str) - Input smiles string for compound object
 
-        kwargs:
-        :name (str) - Default = "Unknown" - Name of compound, also sets
-                      name in Molblock
-        :standardize (bool) - Default = False - Control whether SMILES is
-                              subject to PubChem Standardization attempt
+            kwargs:
+            :name (str) - Default = "Unknown" - Name of compound, also sets
+                          name in Molblock
+            :standardize (bool) - Default = False - Control whether SMILES is
+                                  subject to PubChem Standardization attempt
         """
 
         # Standardize as a kwarg to allow disabling PubChem Standardization
@@ -53,7 +54,8 @@ class Compound(object):
         self.calcMolprops()
 
     def __repr__(self):
-        """repr for debugging"""
+        """repr for debugging
+        """
         return "<Compound(name='%s', formula='%s')>" % (self.name, self.formula)
 
     def copy(self):

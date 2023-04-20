@@ -1,4 +1,4 @@
-from flask import abort, render_template, send_from_directory
+from flask import render_template, abort, send_from_directory
 from flask_login import current_user, login_required
 
 from . import home

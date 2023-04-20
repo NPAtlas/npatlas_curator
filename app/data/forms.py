@@ -1,13 +1,20 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, FieldList
+from wtforms import (
+    StringField,
+    PasswordField,
+    SubmitField,
+    IntegerField,
+    TextAreaField,
+    FormField,
+    FieldList,
+    BooleanField,
+)
 from wtforms import Form as NoCsrfForm
-from wtforms import (FormField, IntegerField, PasswordField, StringField,
-                     SubmitField, TextAreaField)
-from wtforms.validators import DataRequired, Optional, length
+from wtforms.validators import DataRequired, length, Optional
 
-from .. import db
+from .validators import ValidateYear, ValidateDOI, ValidateNumCompounds
 from ..models import Compound
-from .validators import ValidateDOI, ValidateNumCompounds, ValidateYear
+from .. import db
 
 
 class ModelFieldList(FieldList):
