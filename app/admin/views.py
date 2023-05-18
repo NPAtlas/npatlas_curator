@@ -10,7 +10,7 @@ from .. import db
 from ..data.forms import ArticleForm
 from ..models import Article, Compound, Curator, Dataset
 from . import admin, schemas
-from .forms import CuratorForm, DatasetForm
+from .forms import CuratorForm, DatasetDeleteForm, DatasetForm
 
 HERE = Path(__file__).parent
 
@@ -339,3 +339,26 @@ def add_dataset_to_db(data, commit=False):
     if commit:
         db.session.commit()
     return ds
+
+@admin.route("/admin/datasets/delete/<int:id>", methods=["GET", "POST"])
+@login_required
+@require_admin
+def delete_dataset(id):
+    """
+    Delete a dataset from the curator.
+    """
+    dataset = Dataset.query.get_or_404(id)
+
+    form = DatasetDeleteForm()
+    if form.validate_on_submit():
+        db.session.delete(dataset)
+        try:
+            db.session.commit()
+            flash("You have successfully deleted the Dataset")
+        except Exception:
+            db.session.rollback()
+            flash("Error: could not edit Dataset", category="error")
+
+        return redirect(url_for("admin.list_datasets"))
+
+    return render_template("admin/delete_dataset.html", form=form, dataset=dataset)

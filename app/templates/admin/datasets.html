@@ -9,7 +9,7 @@
     <hr class="intro-divider">
     <div class="dataset">
         <div class="row">
-            <div class="col-lg-2">
+            <div class="col-lg-3">
                 See Dataset
             </div>
             <div class="col-lg-2">
@@ -21,17 +21,20 @@
             <div class="col-lg-2">
                 Curator
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-1">
                 Completed
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-1">
                 Checked
+            </div>
+            <div class="col-lg-1">
+                Remove
             </div>
         </div>
         <hr>
         {% for dataset in datasets.items %}
             <div class="row" style="background-color: #dee2e6; padding: 10px 0px 10px 0px;">
-                <div class="col-lg-2">
+                <div class="col-lg-3">
                     {% if dataset.articles|length == 0 %}
                         <em>No Articles</em>
                     {% elif dataset.completed > 0 %}
@@ -91,7 +94,7 @@
                 <div class="col-lg-2">
                     {{ dataset.curator.username }}
                 </div>
-                <div class="col-lg-2" id="dataset-{{ dataset.id }}-completed">
+                <div class="col-lg-1" id="dataset-{{ dataset.id }}-completed">
                     {% if dataset.completed and (dataset.checker_dataset.standardized or dataset.training) %}
                         <i class="far fa-check-circle green"></i>
                     {% elif dataset.completed and not dataset.checker_dataset.standardarized %}
@@ -100,12 +103,15 @@
                         <i class="far fa-times-circle red"></i>
                     {% endif %}
                 </div>
-                <div class="col-lg-2" id="dataset-{{ dataset.id }}-checked">
+                <div class="col-lg-1" id="dataset-{{ dataset.id }}-checked">
                     {% if dataset.checker_completed() %}
                         <i class="far fa-check-circle green"></i>
                     {% else %}
                         <i class="far fa-times-circle red"></i>
                     {% endif %}
+                </div>
+                <div class="col-lg-1" id="dataset-{{ dataset.id}}-remove">
+                    <a href="{{ url_for('admin.delete_dataset', id=dataset.id) }}"><i class="far fa-trash-alt"></i></a>
                 </div>
             </div>
             <div class="row" id="dataset-{{ dataset.id }}-info-row">

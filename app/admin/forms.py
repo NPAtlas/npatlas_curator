@@ -27,3 +27,10 @@ class DatasetForm(FlaskForm):
     instructions = StringField("Instructions")
     curator_id = SelectField("Curator", coerce=int, validate_choice=False)
     submit = SubmitField("Submit Dataset")
+
+
+class DatasetDeleteForm(FlaskForm):
+    """
+    For admin to delete dataset
+    """
+    submit = SubmitField("Delete Dataset")
