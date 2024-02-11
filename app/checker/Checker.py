@@ -278,7 +278,7 @@ class Checker:
         if not restart or restart_changed:
             check_compound = CheckerCompound(
                 id=db_compound.id,
-                name=reg_name.get_name(),
+                name=clean_whitespace(reg_name.get_name()),
                 formula=reg_compound.formula,
                 smiles=reg_compound.smiles,
                 inchi=reg_compound.inchi,
