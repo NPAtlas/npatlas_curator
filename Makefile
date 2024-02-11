@@ -19,14 +19,11 @@ dev:
 echo-name:
 	echo $(REGISTRY)/$(NAME):$(VERSION)
 
-poetryversion:
-	poetry version $(version) 
-	
-# Use like `make version=VERSION version`
-version: poetryversion
+# Use like `make version`
+update-version:
 	$(eval NEW_VERS := $(shell cat pyproject.toml | grep "^version = \"*\"" | cut -d'"' -f2))
-	sed -i "s/__version__ = .*/__version__ = \"$(NEW_VERS)\"/g" app/__init__.py
-	sed -i "s|$(REGISTRY)/$(NAME)\:.*|$(REGISTRY)/$(NAME):$(NEW_VERS)|g" docker-compose.yml docker-compose.prod.yml
+	sed -i '' -e "s/__version__ = .*/__version__ = \"$(NEW_VERS)\"/g" app/__init__.py
+	sed -i '' -e "s|$(REGISTRY)/$(NAME)\:.*|$(REGISTRY)/$(NAME):$(NEW_VERS)|g" docker-compose.yml docker-compose.prod.yml
 
 ecr-login:
 	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $(REGISTRY)
