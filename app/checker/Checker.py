@@ -231,9 +231,9 @@ class Checker:
                 volume=article.volume,
                 issue=article.issue,
                 pages=article.pages,
-                authors=article.authors,
-                title=article.title,
-                abstract=article.abstract,
+                authors=clean_whitespace(article.authors),
+                title=clean_whitespace(article.title),
+                abstract=clean_whitespace(article.abstract),
             )
 
             db_add_commit(check_art)
@@ -365,7 +365,7 @@ class Checker:
         # Watchout for en dash and em dash
         pages = checker_article.pages
         if pages:
-            pages = re.sub(u"\u2013|\u2014", "-", pages)
+            pages = re.sub("\u2013|\u2014", "-", pages)
             if re.search("^[0-9]", pages):
                 res = [x.strip() for x in pages.split("-") if x]
                 res = clean_num_pages(res)
@@ -578,3 +578,9 @@ def clean_species(species_string):
     return re.sub(
         r"\b(sp|sps|sps\.|spp\.|spp)(?!\S)", "sp.", species_string, re.IGNORECASE
     )
+
+
+def clean_whitespace(string):
+    if string is None or not isinstance(string, str):
+        return string
+    return " ".join(string.split())
