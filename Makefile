@@ -27,4 +27,4 @@ echo-name:
 update-version:
 	$(eval NEW_VERS := $(shell cat pyproject.toml | grep "^version = \"*\"" | cut -d'"' -f2))
 	sed -i '' -e "s/__version__ = .*/__version__ = \"$(NEW_VERS)\"/g" app/__init__.py
-	sed -i '' -e "s|$(REGISTRY)/$(NAME)\:.*|$(REGISTRY)/$(NAME):$(NEW_VERS)|g" docker-compose.yml docker-compose.prod.yml
+	sed -i '' -e "s|$(REGISTRY)/$(NAME)\:.*|$(REGISTRY)/$(NAME):$(NEW_VERS)|g" docker-compose.yml
