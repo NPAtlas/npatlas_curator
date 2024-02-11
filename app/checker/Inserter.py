@@ -145,7 +145,10 @@ class Inserter:
                 c_compound = ds_compound.checker_compound
 
                 # Double check compound doesn't match Atlas without being handled
-                if self.check_atlas_match(c_compound) and not c_compound.resolve:
+                if (
+                    self.check_atlas_match(c_compound.inchikey)
+                    and not c_compound.resolve
+                ):
                     self.logger.error("Found an uncaught match for a compound!")
                     self.logger.error("%s - %s", c_compound.name, c_compound.inchikey)
                     self.reject_dataset()
