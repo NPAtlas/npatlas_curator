@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "npatlas_curator"
-version = "3.3.13"
+version = "3.3.14"
 description = "NP Atlas Online Curation Tool"
 authors = ["jvansan <jeffreyavansanten@gmail.com>"]
 
