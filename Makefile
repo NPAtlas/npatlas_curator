@@ -4,8 +4,12 @@ REGISTRY := 697769791234.dkr.ecr.us-west-2.amazonaws.com
 
 all: build-docker tag push
 
+
+ecr-login:
+	aws ecr get-login-password --region us-west-2 --profile sfu | docker login --username AWS --password-stdin $(REGISTRY)
+
 build-docker:
-	docker build -t $(NAME):$(VERSION) .
+	docker build --platform=linux/amd64 -t $(NAME):$(VERSION) .
 
 tag:
 	docker tag $(NAME):$(VERSION) $(REGISTRY)/$(NAME):$(VERSION)
@@ -24,6 +28,3 @@ update-version:
 	$(eval NEW_VERS := $(shell cat pyproject.toml | grep "^version = \"*\"" | cut -d'"' -f2))
 	sed -i '' -e "s/__version__ = .*/__version__ = \"$(NEW_VERS)\"/g" app/__init__.py
 	sed -i '' -e "s|$(REGISTRY)/$(NAME)\:.*|$(REGISTRY)/$(NAME):$(NEW_VERS)|g" docker-compose.yml docker-compose.prod.yml
-
-ecr-login:
-	aws ecr get-login-password --region us-west-2 | docker login --username AWS --password-stdin $(REGISTRY)
