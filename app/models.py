@@ -132,6 +132,9 @@ class Dataset(db.Model):
             else False
         )
 
+    def has_checker_dataset(self):
+        return self.checker_dataset is not None
+
     def checker_completed(self):
         """
         Boolean return if checker dataset exists and has completed checking
@@ -272,7 +275,6 @@ class CheckerCompound(db.Model):
 
 
 class Journal(db.Model):
-
     """Table of accepted Journal Names
 
     Attributes

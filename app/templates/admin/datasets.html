@@ -8,14 +8,14 @@
     {% if datasets %}
     <hr class="intro-divider">
     <div class="dataset">
-        <div class="row">
-            <div class="col-lg-3">
+        <div class="row text-center">
+            <div class="col-lg-2">
                 See Dataset
             </div>
-            <div class="col-lg-2">
-                Number of Articles
+            <div class="col-lg-1">
+                # Articles
             </div>
-            <div class="col-lg-2">
+            <div class="col-lg-3">
                 Checker
             </div>
             <div class="col-lg-2">
@@ -28,13 +28,16 @@
                 Checked
             </div>
             <div class="col-lg-1">
+                Hard Reset Checker
+            </div>
+            <div class="col-lg-1">
                 Remove
             </div>
         </div>
         <hr>
         {% for dataset in datasets.items %}
             <div class="row" style="background-color: #dee2e6; padding: 10px 0px 10px 0px;">
-                <div class="col-lg-3">
+                <div class="col-lg-2">
                     {% if dataset.articles|length == 0 %}
                         <em>No Articles</em>
                     {% elif dataset.completed > 0 %}
@@ -57,10 +60,10 @@
                         </a>
                     {% endif %}
                 </div>
-                <div class="col-lg-2">
+                <div class="col-lg-1">
                     {{ dataset.articles|length }}
                 </div>
-                <div class="col-lg-2">
+                <div class="col-lg-3">
                     <!-- Hidden input for keeping dataset id -->
                     <input id="dataset-id-{{ dataset.id }}" class="dataset-id" type="hidden" style="display: none" value="{{ dataset.id }}">
                     {% if dataset.checker_dataset.inserted %}
@@ -110,6 +113,13 @@
                         <i class="far fa-times-circle red"></i>
                     {% endif %}
                 </div>
+                <div class="col-lg-1" id="dataset-{{ dataset.id}}-reset">
+                    {% if dataset.has_checker_dataset() and not dataset.training and not dataset.inserted() %}
+                        <a href="{{ url_for('admin.reset_checker_dataset', id=dataset.id) }}"><i class="fas fa-sync-alt"></i></a>
+                    {% else %}
+                        <a class="btn disabled" href=""><i class="fas fa-sync-alt disabled"></i></a>
+                    {% endif %}
+                </div>  
                 <div class="col-lg-1" id="dataset-{{ dataset.id}}-remove">
                     <a href="{{ url_for('admin.delete_dataset', id=dataset.id) }}"><i class="far fa-trash-alt"></i></a>
                 </div>

@@ -33,4 +33,13 @@ class DatasetDeleteForm(FlaskForm):
     """
     For admin to delete dataset
     """
+
     submit = SubmitField("Delete Dataset")
+
+
+class DatasetResetForm(FlaskForm):
+    """
+    For admin to delete dataset
+    """
+
+    submit = SubmitField("Reset Dataset")

@@ -1,0 +1,28 @@
+{% extends "base.html" %} 
+{% import "bootstrap/wtf.html" as wtf %}
+{% block title %}Data Dashboard{% endblock %} 
+{% block body %}
+<div class="container">
+  <h1 style="text-align: center;">Reset Dataset Checker</h1>
+  <h4>Hard reset the checker for a dataset</h4>
+  <p>
+    This will reset all the past checks and standardization for the dataset.
+    You will have to re-standardize and re-check the dataset.
+    </br>
+    This is useful if there are errors from the checker which require a hard reset.
+  </p>
+  <div>
+    <p>
+      ID: {{ dataset.id }}
+    </p>
+    <p> Curator: {{ dataset.curator.username }}</p>
+    <p>
+      Instructions: {{ dataset.instructions}}
+    </p>
+  </div>
+
+  {{ wtf.quick_form(form, button_map={'submit': 'danger'}) }}
+
+</div>
+
+{% endblock %}

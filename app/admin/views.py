@@ -10,7 +10,7 @@ from .. import db
 from ..data.forms import ArticleForm
 from ..models import Article, Compound, Curator, Dataset
 from . import admin, schemas
-from .forms import CuratorForm, DatasetDeleteForm, DatasetForm
+from .forms import CuratorForm, DatasetDeleteForm, DatasetForm, DatasetResetForm
 
 HERE = Path(__file__).parent
 
@@ -340,6 +340,7 @@ def add_dataset_to_db(data, commit=False):
         db.session.commit()
     return ds
 
+
 @admin.route("/admin/datasets/delete/<int:id>", methods=["GET", "POST"])
 @login_required
 @require_admin
@@ -362,3 +363,29 @@ def delete_dataset(id):
         return redirect(url_for("admin.list_datasets"))
 
     return render_template("admin/delete_dataset.html", form=form, dataset=dataset)
+
+
+@admin.route("/admin/datasets/checker-reset/<int:id>", methods=["GET", "POST"])
+@login_required
+@require_admin
+def reset_checker_dataset(id):
+    """
+    Hard resets the checker dataset from the curator.
+    """
+    dataset = Dataset.query.get_or_404(id)
+    checker_ds = dataset.checker_dataset
+
+    form = DatasetResetForm()
+    if form.validate_on_submit():
+
+        db.session.delete(checker_ds)
+        try:
+            db.session.commit()
+            flash("You have successfully reset the checker for dataset")
+        except Exception:
+            db.session.rollback()
+            flash("Error: could not edit Dataset", category="error")
+
+        return redirect(url_for("admin.list_datasets"))
+
+    return render_template("admin/reset_dataset.html", form=form, dataset=dataset)
