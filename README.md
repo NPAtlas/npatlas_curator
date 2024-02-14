@@ -140,7 +140,6 @@ Make sure you have a SQL dump loaded into the `./data` directory.
 # setup npatlas database
 docker-compose exec atlasdb psql -U npatlas -c 'create database np_atlas_dev' 
 docker-compose exec -T atlasdb psql -d np_atlas_dev -U npatlas < ./data/npatlas_dev.psql
-docker-compose exec atlasdb psql -U npatlas -c 'alter database np_atlas_dev set search_path to np_atlas,rdk,public;'
 # setup authentication database
 docker-compose exec atlasdb psql -U npatlas -c 'create database authentication'
 # last step here would be to add admin user, but I'm going to skip this as it's a bunch of extra work...
