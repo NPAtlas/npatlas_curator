@@ -25,7 +25,7 @@ RUN mkdir /home/flask/app
 WORKDIR /home/flask/app
 COPY poetry.lock pyproject.toml ./
 RUN  poetry config virtualenvs.create false \
-    && poetry install --no-interaction --no-ansi --without dev
+    && poetry install --no-interaction --no-ansi --without dev --no-root
 
 USER flask
 
