@@ -3,6 +3,7 @@ name = "npatlas_curator"
 version = "3.3.14"
 description = "NP Atlas Online Curation Tool"
 authors = ["jvansan <jeffreyavansanten@gmail.com>"]
+packages = [{include = "app"}]
 
 [tool.poetry.dependencies]
 python = "^3.8"
